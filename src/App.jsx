@@ -143,34 +143,32 @@ function App() {
       <div className="container">
         <Header />
         
-        <h2>Select Products</h2>
-        
-        <div className="product-list-container">
-          {isLoadingProducts ? (
-            Array.from({ length: NUM_SKELETONS }).map((_, index) => (
-              <ProductSkeleton key={index} />
-            ))
-          ) : (
-            <ProductList 
-              products={products}
-              selectedProducts={selectedProductIds}
-              onSelectionChange={handleSelectionChange}
-            />
-          )}
+        <div className="section-products">
+          <h2>Select Products</h2>
+          <div className="product-list-container">
+            {isLoadingProducts ? (
+              Array.from({ length: NUM_SKELETONS }).map((_, index) => (
+                <ProductSkeleton key={index} />
+              ))
+            ) : (
+              <ProductList 
+                products={products}
+                selectedProducts={selectedProductIds}
+                onSelectionChange={handleSelectionChange}
+              />
+            )}
+          </div>
         </div>
 
         {!isLoadingProducts && (
-          <>
+          <div className="section-controls">
             <TotalDisplay totalPrice={totalPrice} />
-
             <PhoneInput 
               phoneNumber={phoneNumber}
               onPhoneChange={handlePhoneChange}
               isPhoneValid={isPhoneValid}
               phoneHasInput={phoneHasInput}
             />
-
-            {/* Container for Button */} 
             <div className={`payment-button-container ${showPaymentInfo ? 'hidden' : ''}`}>
                 <div className="payment-button-wrapper">
                     <button 
@@ -183,21 +181,19 @@ function App() {
                     </button>
                 </div>
             </div>
-
-            {/* Payment Info Wrapper for slide/fade transition */} 
-            <div className={`payment-info-wrapper ${showPaymentInfo ? 'visible' : ''}`}> 
-              {/* Conditionally render PaymentInfo OR always render and rely on CSS hide/show? 
-                  Let's always render to ensure smooth transitions */}
-              <PaymentInfo 
-                products={products}
-                selectedProductIds={selectedProductIds}
-                totalPrice={totalPrice}
-                phoneNumber={phoneNumber}
-                onCancel={handleCancelPayment}
-              />
-            </div>
-          </>
+          </div>
         )}
+
+        <div className={`payment-info-wrapper ${showPaymentInfo ? 'visible' : ''}`}> 
+          <PaymentInfo 
+            products={products}
+            selectedProductIds={selectedProductIds}
+            totalPrice={totalPrice}
+            phoneNumber={phoneNumber}
+            onCancel={handleCancelPayment}
+          />
+        </div>
+
       </div>
       <Footer />
     </>

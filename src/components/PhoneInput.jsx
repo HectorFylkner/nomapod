@@ -29,9 +29,9 @@ function PhoneInput({ phoneNumber, onPhoneChange, isPhoneValid, phoneHasInput })
       <span className="phone-hint">Used only to send the unlock code.</span>
       <span 
         id="phone-error-msg" 
-        className="phone-error-message" 
-        role="alert" // Accessibility improvement
-        style={{ display: showError ? 'block' : 'none' }} // Control visibility
+        className={`phone-error-message ${showError ? 'visible' : ''}`} 
+        role="alert" 
+        aria-live="polite" /* Announce changes politely */
       >
         Please enter a valid 10-digit number (e.g., 07XXXXXXXX).
       </span>
