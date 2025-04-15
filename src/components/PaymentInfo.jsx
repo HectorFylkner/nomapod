@@ -23,17 +23,6 @@ function PaymentInfo({ products, selectedProductIds, totalPrice, phoneNumber, on
     <div className="payment-info">
       <h3>Payment Instructions</h3>
       
-      {selectedItems.length > 0 && (
-        <div className="selected-items-summary">
-          <h4>Your Selection:</h4>
-          <ul>
-            {selectedItems.map(item => (
-              <li key={item.id}>{item.name} - {item.price} SEK</li>
-            ))}
-          </ul>
-        </div>
-      )}
-
       <p className="final-amount">Amount: <span>{totalPrice}</span> SEK</p>
       <p className="swish-number">Swish payment to: <span>{SWISH_NUMBER}</span></p>
       <p><strong>Important:</strong> Enter your phone number (<span>{phoneNumber}</span>) as the message.</p>
