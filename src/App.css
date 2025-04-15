@@ -2,12 +2,18 @@
 /* Styles adapted from original styles.css */
 
 .container {
-    background-color: var(--card-background);
-    padding: 25px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    /* Glassmorphism */
+    background: rgba(255, 255, 255, 0.2); /* Semi-transparent white */
+    backdrop-filter: blur(15px); /* Adjust blur amount as needed */
+    -webkit-backdrop-filter: blur(15px); /* Safari fallback */
+    border: 1px solid rgba(255, 255, 255, 0.18); /* Subtle white border */
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15); /* Softer, slightly colored shadow */
+
+    /* Original styles */
+    padding: 30px; /* Increased padding */
+    border-radius: 15px; /* More rounded corners */
     width: 100%;
-    max-width: 400px;
+    max-width: 420px; /* Slightly wider? */
     margin-bottom: 30px;
 }
 
@@ -24,7 +30,7 @@ h2 {
     font-weight: 600;
     margin-bottom: 20px;
     color: var(--text-color);
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Lighter border */
     padding-bottom: 10px;
     text-align: center;
 }
@@ -58,13 +64,13 @@ h2 {
     display: flex;
     align-items: center;
     padding: 10px 8px;
-    border: 1px solid var(--border-color);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     cursor: pointer;
     font-size: 1em;
     transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-    border-radius: 6px;
-    margin-bottom: 8px;
-    background-color: var(--card-background);
+    border-radius: 10px; /* Consistent rounding */
+    margin-bottom: 10px;
+    background-color: rgba(255, 255, 255, 0.1); /* Very subtle bg */
 }
 .product-item label:last-child {
     margin-bottom: 0;
@@ -74,8 +80,8 @@ h2 {
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
 }
 .product-item label.selected-product {
-    background-color: var(--selected-bg-color);
-    border-color: var(--primary-color);
+    background-color: rgba(255, 255, 255, 0.3); /* More opaque selected bg */
+    border-color: rgba(255, 255, 255, 0.5);
     box-shadow: 0 1px 3px rgba(78, 93, 108, 0.2);
     font-weight: 500;
     transform: scale(1.02);
@@ -139,18 +145,21 @@ h2 {
 }
 
 .phone-input-section input[type="tel"] {
+    background-color: rgba(255, 255, 255, 0.15); /* Slightly transparent input */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--text-color); /* Ensure text is readable */
     width: 100%;
     padding: 12px;
-    border: 1px solid var(--border-color);
-    border-radius: 5px;
+    border-radius: 8px; /* Consistent rounding */
     font-size: 1em;
     box-sizing: border-box;
     margin-bottom: 5px;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 .phone-input-section input[type="tel"]:focus {
+    background-color: rgba(255, 255, 255, 0.3);
     outline: none;
-    border-color: var(--primary-color);
+    border-color: rgba(255, 255, 255, 0.5);
     box-shadow: 0 0 0 2px rgba(78, 93, 108, 0.2);
 }
 /* Style for explicitly marking invalid phone input via JS */
@@ -274,34 +283,42 @@ h2 {
 }
 
 .payment-info-wrapper {
-    /* Wrapper to handle smooth transition */
-    transition: max-height 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), /* Smoother ease */
+    /* Apply glass to wrapper or directly to .payment-info? */
+    /* Let's try applying to wrapper for transition consistency */
+    background: rgba(255, 255, 255, 0.15); /* Slightly less transparent */
+    backdrop-filter: blur(10px); /* Slightly less blur? */
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08); 
+    /* Original transition styles */
+    transition: max-height 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
                 opacity 0.4s ease-in-out,
                 transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-                margin-top 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                margin-top 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                background 0.3s ease, backdrop-filter 0.3s ease; /* Add transitions for glass */
     max-height: 0;
     opacity: 0;
-    transform: translateY(-15px); /* Start slightly higher */
+    transform: translateY(-15px); 
     overflow: hidden;
     margin-top: 0;
-    border-radius: 8px; /* Apply rounding to wrapper */
-    /* Add shadow for separation */
-    box-shadow: 0 5px 15px rgba(0,0,0,0.08); 
+    border-radius: 15px; /* Match container rounding */
 }
 
 .payment-info-wrapper.visible {
-    max-height: 1000px; /* Large enough to fit content */
+    /* Original visible styles */
+    max-height: 1000px; 
     opacity: 1;
     transform: translateY(0);
-    margin-top: 30px; /* Space above */
+    margin-top: 30px; 
 }
 
 /* Adjust original .payment-info styles */
 .payment-info {
+    /* Remove background from inner element if wrapper has it */
+    background-color: transparent; 
     border: none; 
-    border-radius: 8px; /* Already rounded by wrapper */
-    background-color: var(--card-background); /* Use card bg */
-    padding: 25px; /* Match container padding */
+    border-radius: 15px; 
+    padding: 25px;
     width: 100%;
     box-sizing: border-box;
     flex-grow: 1; 
