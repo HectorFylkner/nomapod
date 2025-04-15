@@ -1,37 +1,38 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Header from './components/Header';
 import ProductList from './components/ProductList';
+import ProductSkeleton from './components/ProductSkeleton';
 import TotalDisplay from './components/TotalDisplay';
 import PhoneInput from './components/PhoneInput';
 import PaymentInfo from './components/PaymentInfo';
 import Footer from './components/Footer';
-import LoadingSpinner from './components/LoadingSpinner';
 import './App.css';
+
+const NUM_SKELETONS = 4;
 
 function App() {
   const [products, setProducts] = useState([]);
   const [selectedProductIds, setSelectedProductIds] = useState([]);
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [phoneHasInput, setPhoneHasInput] = useState(false); // Track if user typed in phone input
+  const [phoneHasInput, setPhoneHasInput] = useState(false);
   const [showPaymentInfo, setShowPaymentInfo] = useState(false);
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
   const [productError, setProductError] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false); // For button loading state
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Fetch products on mount
   useEffect(() => {
     const fetchProducts = async () => {
+      setIsLoadingProducts(true);
+      setProductError(null);
       try {
-        // Construct path relative to the base URL for deployment
-        const productsPath = `${import.meta.env.BASE_URL}products.json`; 
-        console.log("Fetching products from:", productsPath); // Add log for debugging
-        const response = await fetch(productsPath); 
+        const productsPath = `${import.meta.env.BASE_URL}products.json`;
+        const response = await fetch(productsPath);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status} ${response.statusText}`);
         }
         const data = await response.json();
         setProducts(data);
-        setProductError(null);
       } catch (error) {
         console.error("Could not load products:", error);
         setProductError('Failed to load products. Please refresh or try again later.');
@@ -59,7 +60,7 @@ function App() {
   // Handle phone number input change
   const handlePhoneChange = useCallback((value) => {
     setPhoneNumber(value);
-    setPhoneHasInput(true); // User has interacted with the input
+    setPhoneHasInput(true);
     // Hide payment info if phone number changes
     setShowPaymentInfo(false); 
   }, []);
@@ -86,7 +87,6 @@ function App() {
     if (!canProceedToPayment || isSubmitting) return;
 
     setIsSubmitting(true);
-    // Simulate delay like original script
     setTimeout(() => {
         setShowPaymentInfo(true);
         setIsSubmitting(false);
@@ -111,17 +111,13 @@ function App() {
           reason += '.';
       } else if (!productSelected) {
           reason += 'select a product.';
-      } else { // Phone must be invalid
+      } else {
           reason += 'enter a valid 10-digit phone number (07XXXXXXXX).';
       }
       return reason;
   }, [canProceedToPayment, selectedProductIds, isPhoneValid, phoneHasInput]);
 
-  // Render logic based on loading/error state
-  if (isLoadingProducts) {
-    return <div className="loading-message"><LoadingSpinner size="30px" /> Loading Products...</div>;
-  }
-
+  // Render Error state first if product fetch failed
   if (productError) {
     return <div className="error-message">{productError}</div>;
   }
@@ -132,33 +128,46 @@ function App() {
         <Header />
         
         <h2>Select Products</h2>
-        <ProductList 
-          products={products}
-          selectedProducts={selectedProductIds}
-          onSelectionChange={handleSelectionChange}
-        />
+        
+        <div className="product-list-container">
+          {isLoadingProducts ? (
+            Array.from({ length: NUM_SKELETONS }).map((_, index) => (
+              <ProductSkeleton key={index} />
+            ))
+          ) : (
+            <ProductList 
+              products={products}
+              selectedProducts={selectedProductIds}
+              onSelectionChange={handleSelectionChange}
+            />
+          )}
+        </div>
 
-        <TotalDisplay totalPrice={totalPrice} />
+        {!isLoadingProducts && (
+          <>
+            <TotalDisplay totalPrice={totalPrice} />
 
-        <PhoneInput 
-          phoneNumber={phoneNumber}
-          onPhoneChange={handlePhoneChange}
-          isPhoneValid={isPhoneValid}
-          phoneHasInput={phoneHasInput}
-        />
+            <PhoneInput 
+              phoneNumber={phoneNumber}
+              onPhoneChange={handlePhoneChange}
+              isPhoneValid={isPhoneValid}
+              phoneHasInput={phoneHasInput}
+            />
 
-        {!showPaymentInfo && (
-            <button 
-                className={`payment-button ${isSubmitting ? 'loading' : ''}`}
-                onClick={handleShowPaymentInfo}
-                disabled={!canProceedToPayment || isSubmitting}
-                title={paymentButtonTitle}
-            >
-                <span>Show Payment Info</span>
-            </button>
+            {!showPaymentInfo && (
+                <button 
+                    className={`payment-button ${isSubmitting ? 'loading' : ''}`}
+                    onClick={handleShowPaymentInfo}
+                    disabled={!canProceedToPayment || isSubmitting}
+                    title={paymentButtonTitle}
+                >
+                    <span>Show Payment Info</span>
+                </button>
+            )}
+          </>
         )}
 
-        {showPaymentInfo && (
+        <div className={`payment-info-wrapper ${showPaymentInfo ? 'visible' : ''}`}>
           <PaymentInfo 
             products={products}
             selectedProductIds={selectedProductIds}
@@ -166,7 +175,8 @@ function App() {
             phoneNumber={phoneNumber}
             onCancel={handleCancelPayment}
           />
-        )}
+        </div>
+
       </div>
       <Footer />
     </>

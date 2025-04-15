@@ -1,0 +1,65 @@
+/* src/components/ProductSkeleton.css */
+
+.skeleton-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  margin-bottom: 8px;
+  background-color: var(--card-background);
+  overflow: hidden; /* Important for shimmer effect */
+  position: relative; /* Important for shimmer effect */
+}
+
+.skeleton {
+  background: #eee; /* Base skeleton color */
+  background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+  border-radius: 4px;
+  background-size: 200% 100%; 
+  animation: 1.5s shine linear infinite;
+}
+
+.skeleton-checkbox {
+  width: 20px;
+  height: 20px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.skeleton-image {
+  width: 50px;
+  height: 50px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.skeleton-text-group {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px; /* Space between text lines */
+}
+
+.skeleton-text {
+  height: 1em; /* Approx height of text */
+  width: 80%; /* Default width */
+}
+
+.skeleton-text-short {
+  width: 50%; /* Shorter line */
+}
+
+.skeleton-price {
+  width: 50px; /* Approx width of price */
+  height: 1.2em; /* Approx height of price */
+  margin-left: 10px;
+  flex-shrink: 0;
+}
+
+/* Shimmer animation */
+@keyframes shine {
+  to {
+    background-position-x: -200%;
+  }
+} 
