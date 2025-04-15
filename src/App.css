@@ -293,16 +293,17 @@ h2 {
 }
 
 .payment-flipper-front {
-  /* position: relative; Revert to absolute */
+  position: relative; /* Revert front face to relative */
   z-index: 2;
-  /* Ensure button is vertically centered or positioned if container is tall */
-  display: flex; /* Use flex to center button if needed */
-  align-items: center; /* Center vertically */
-  justify-content: center; /* Center horizontally */
+  /* Remove flex centering - button is block level */
+  /* display: flex; */
+  /* align-items: center; */
+  /* justify-content: center; */
   /* background: lightcoral; */ /* Debugging */
 }
 
 .payment-flipper-back {
+  position: absolute; /* Ensure back face IS absolute */
   transform: rotateY(180deg);
   display: flex;
   flex-direction: column;
