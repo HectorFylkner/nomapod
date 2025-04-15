@@ -29,6 +29,19 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Keyframes for the background gradient animation */
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 html {
     box-sizing: border-box;
 }
@@ -41,8 +54,12 @@ html {
 }
 
 body {
-  /* Add subtle background gradient */
-  background: linear-gradient(to bottom, var(--background-color) 0%, var(--background-color-light) 100%);
+  /* Subtle background gradient - make it larger for animation */
+  background: linear-gradient(135deg, var(--background-color) 0%, var(--background-color-light) 50%, var(--background-color) 100%);
+  background-size: 200% 200%; /* Make background larger than viewport */
+  /* Apply the animation */
+  animation: gradientShift 15s ease infinite; /* 15s duration, smooth easing, infinite loop */
+
   display: flex;
   flex-direction: column;
   place-items: center;
