@@ -255,32 +255,66 @@ h2 {
     }
 }
 
-/* Payment Info Section */
-.payment-info-wrapper {
-    /* Wrapper to handle smooth transition */
-    transition: max-height 0.4s ease-in-out, opacity 0.4s ease-in-out, transform 0.4s ease-in-out, margin-top 0.4s ease-in-out;
-    max-height: 0;
-    opacity: 0;
-    transform: translateY(-10px);
-    overflow: hidden;
-    margin-top: 0;
+/* Card Flip Styles */
+.payment-flipper-container {
+  perspective: 1000px; /* Enables 3D space */
+  margin-top: 20px; /* Space above the card */
+  position: relative;
+  width: 100%;
+  max-width: 400px; /* Match button/container width */
+  min-height: 60px; /* Approx height of button to prevent layout shift */
 }
 
-.payment-info-wrapper.visible {
-    max-height: 1000px; /* Large enough to fit content */
-    opacity: 1;
-    transform: translateY(0);
-    margin-top: 30px; /* Original margin */
+.payment-flipper {
+  position: relative; /* Changed from absolute to relative if container has min-height */
+  width: 100%;
+  min-height: 60px; /* Ensure flipper takes up initial space */
+  transition: transform 0.7s cubic-bezier(0.4, 0.0, 0.2, 1); /* Smoother transition */
+  transform-style: preserve-3d;
 }
 
+/* Apply flip transform when container has .show-back */
+.payment-flipper-container.show-back .payment-flipper {
+  transform: rotateY(180deg);
+}
+
+.payment-flipper-front,
+.payment-flipper-back {
+  position: absolute; /* Position faces on top of each other */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%; /* Ensure back face covers the area */
+  -webkit-backface-visibility: hidden; /* Hide back side of element during flip */
+  backface-visibility: hidden;
+  /* Add overflow hidden potentially if content might briefly exceed bounds */
+  overflow: hidden; 
+}
+
+.payment-flipper-front {
+  /* Front is visible by default */
+  z-index: 2; /* Ensure front is initially above */
+}
+
+.payment-flipper-back {
+  transform: rotateY(180deg); /* Pre-rotate the back face */
+  /* Ensure back content starts at top, background, etc. */
+  display: flex; /* Use flex to align content if needed */
+  flex-direction: column;
+  background-color: var(--card-background); /* Give back a solid background */ 
+  border-radius: 8px; /* Match container rounding if needed */ 
+  /* Note: The .payment-info styles will apply inside this */
+}
+
+/* Adjust original .payment-info styles */
 .payment-info {
-    /* Original styles, but remove margin-top and overflow/transitions */
-    /* margin-top: 30px; */ 
-    border-radius: 8px;
-    background-color: #e9ecef;
-    /* overflow: hidden; */ 
+    border: none; /* Remove border, handled by back face potentially */
+    border-radius: 8px; /* Ensure consistent rounding */
+    /* background-color: #e9ecef;  Apply background to back face instead? */
     padding: 20px;
-    border: 1px solid var(--border-color);
+    /* Remove margin-top */
+    width: 100%; /* Ensure it fills the back face */
+    box-sizing: border-box;
 }
 
 .payment-info h3 {

@@ -168,29 +168,31 @@ function App() {
               phoneHasInput={phoneHasInput}
             />
 
-            {!showPaymentInfo && (
-                <button 
-                    className={`payment-button ${isSubmitting ? 'loading' : ''} ${showPulse ? 'pulse-enable' : ''}`}
-                    onClick={handleShowPaymentInfo}
-                    disabled={!canProceedToPayment || isSubmitting}
-                    title={paymentButtonTitle}
-                >
-                    <span>Show Payment Info</span>
-                </button>
-            )}
+            <div className={`payment-flipper-container ${showPaymentInfo ? 'show-back' : ''}`}>
+              <div className="payment-flipper">
+                <div className="payment-flipper-front">
+                  <button 
+                      className={`payment-button ${isSubmitting ? 'loading' : ''} ${showPulse ? 'pulse-enable' : ''}`}
+                      onClick={handleShowPaymentInfo}
+                      disabled={!canProceedToPayment || isSubmitting}
+                      title={paymentButtonTitle}
+                  >
+                      <span>Show Payment Info</span>
+                  </button>
+                </div>
+                <div className="payment-flipper-back">
+                  <PaymentInfo 
+                    products={products}
+                    selectedProductIds={selectedProductIds}
+                    totalPrice={totalPrice}
+                    phoneNumber={phoneNumber}
+                    onCancel={handleCancelPayment}
+                  />
+                </div>
+              </div>
+            </div>
           </>
         )}
-
-        <div className={`payment-info-wrapper ${showPaymentInfo ? 'visible' : ''}`}>
-          <PaymentInfo 
-            products={products}
-            selectedProductIds={selectedProductIds}
-            totalPrice={totalPrice}
-            phoneNumber={phoneNumber}
-            onCancel={handleCancelPayment}
-          />
-        </div>
-
       </div>
       <Footer />
     </>
