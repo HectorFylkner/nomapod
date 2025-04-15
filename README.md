@@ -1,4 +1,3 @@
-# nomapod
 # nomapod - MVP Payment Landing Page
 
 ## Description

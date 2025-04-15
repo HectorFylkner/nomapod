@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nomapod Purchase v3</title>
+    <style>
+        :root {
+            --background-color: #f8f9fa; /* Reverted to original light grey */
+            --text-color: #212529;
+            --primary-color: #4e5d6c;
+            --border-color: #dee2e6;
+            --disabled-color: #adb5bd;
+            --card-background: #ffffff;
+            --selected-bg-color: #eef2f7;
+            --error-color: #dc3545;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            --footer-height: 100px; /* Approximate height for sticky footer calculation */
+        }
+
+        html {
+            box-sizing: border-box;
+        }
+        *,
+        *::before,
+        *::after {
+            box-sizing: inherit;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: var(--card-background); /* Reverted to white background */
+            /* background-color: var(--background-color); */ /* Match body background */
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); /* Keep shadow for some definition */
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 30px; /* Added margin back */
+        }
+
+        .logo-image {
+            display: block; /* Allows centering with margin */
+            height: auto; /* Let height adjust automatically */
+            width: auto;  /* Let width adjust based on height/max-width */
+            max-width: 300px; /* Increase max-width significantly, constrain overall size */
+            margin: 0 auto 40px auto; /* Center horizontally, adjust bottom margin */
+            /* Remove background-color from placeholder */
+        }
+
+        h2 {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            color: var(--text-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            text-align: center; /* Center headings */
+        }
+
+        .product-list label {
+            display: flex;
+            align-items: center;
+            padding: 10px 8px; /* Consistent padding */
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+            border-radius: 6px; /* Slightly more rounded */
+            margin-bottom: 8px;
+            background-color: var(--card-background); /* Ensure background for hover */
+        }
+        .product-list label:last-child {
+            margin-bottom: 0;
+        }
+        /* Hover/Focus effect */
+        .product-list label:hover {
+            background-color: #fdfdfd;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+            /* transform: scale(1.01); */ /* Optional: subtle scale */
+        }
+
+        .product-list label.selected-product {
+             background-color: var(--selected-bg-color);
+             border-color: var(--primary-color);
+             box-shadow: 0 1px 3px rgba(78, 93, 108, 0.2);
+             font-weight: 500; /* Make text slightly bolder */
+        }
+        .product-list label.selected-product:hover {
+             background-color: #e6eef6; /* Slightly darker selected hover */
+        }
+
+        .product-list input[type="checkbox"] {
+            margin-right: 12px; /* Slightly more space */
+            accent-color: var(--primary-color);
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .product-image {
+            width: 50px; /* Adjusted size slightly */
+            height: 50px;
+            object-fit: contain;
+            margin-right: 12px;
+            flex-shrink: 0;
+            background-color: #eee;
+            border-radius: 4px;
+        }
+
+        .product-name {
+            flex-grow: 1;
+        }
+
+        .product-price {
+            font-weight: 500;
+            margin-left: 10px;
+             flex-shrink: 0;
+             color: var(--primary-color); /* Color price */
+        }
+
+        /* --- Sticky Footer Action Area --- REMOVED */
+        /* Styles for .action-footer removed */
+
+        .total-section {
+            /* Styles restored to original */
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+            text-align: right;
+            font-size: 1.1em;
+            font-weight: 600;
+            /* width: 100%; */
+            /* max-width: 400px; */
+            margin-bottom: 20px; /* Added margin below total */
+        }
+
+        .phone-input-section {
+            margin-top: 25px;
+        }
+
+        .phone-input-section label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            padding-left: 2px; /* Align with input */
+        }
+
+        .phone-input-section input[type="tel"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 1em;
+            box-sizing: border-box;
+            margin-bottom: 5px;
+             transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .phone-input-section input[type="tel"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(78, 93, 108, 0.2);
+        }
+        .phone-input-section input[type="tel"]:invalid {
+            border-color: var(--error-color);
+            box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.2);
+        }
+
+        .phone-hint {
+            font-size: 0.8em;
+            color: #6c757d;
+            margin-bottom: 20px;
+            display: block;
+             padding-left: 2px;
+        }
+
+        button#payment-button {
+            display: block;
+            width: 100%;
+            max-width: 400px; /* Match container width */
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease, opacity 0.2s ease;
+            position: relative; /* Needed for pseudo-element loader */
+            overflow: hidden; /* Hide overflow for loader */
+        }
+        /* Loading state style */
+        button#payment-button.loading::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 16px;
+            height: 16px;
+            margin-top: -8px;
+            margin-left: -8px;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+        button#payment-button.loading span {
+            visibility: hidden; /* Hide text when loading */
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        button#payment-button:disabled {
+            background-color: var(--disabled-color);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        button#payment-button:not(:disabled):hover {
+            background-color: #3b4754;
+        }
+
+        /* Enhanced Payment Info Animation */
+        #payment-info {
+            margin-top: 30px;
+            border-radius: 8px;
+            background-color: #e9ecef;
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: max-height 0.4s ease-in-out, opacity 0.4s ease-in-out, transform 0.4s ease-in-out, padding 0.4s ease-in-out, border-color 0.4s ease-in-out;
+            padding: 0 20px;
+            border: 1px solid transparent;
+        }
+        #payment-info.visible {
+             max-height: 600px; /* Generous max height */
+             opacity: 1;
+             transform: translateY(0);
+             padding: 20px;
+             border-color: var(--border-color);
+        }
+
+        #payment-info h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            text-align: center;
+        }
+        #payment-info h4 {
+            font-size: 0.95em;
+            color: var(--text-color);
+            text-align: center;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        #payment-info p {
+            margin-bottom: 10px;
+            line-height: 1.5;
+            text-align: center;
+            font-size: 0.95em;
+        }
+        #payment-info p.swish-number {
+             font-weight: 600;
+             font-size: 1.1em;
+        }
+         #payment-info p.final-amount {
+             font-weight: bold;
+             font-size: 1.2em;
+             margin-bottom: 15px;
+         }
+         #payment-info ul {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0 15px 0;
+            text-align: center;
+            font-size: 0.9em;
+         }
+         #payment-info ul li {
+            margin-bottom: 5px;
+         }
+
+         button#cancel-payment {
+            display: block;
+            width: auto;
+            margin: 20px auto 0 auto;
+            padding: 8px 15px;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+         }
+         button#cancel-payment:hover {
+             background-color: #5a6268;
+         }
+
+
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.85em;
+            color: #6c757d;
+            padding-bottom: 20px; /* Ensure footer text visible above sticky */
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Use actual image tag for logo -->
+        <img src="nomapod.png" alt="nomapod Logo" class="logo-image">
+
+        <h2>Select Products</h2>
+        <div id="product-list" class="product-list">
+            <!-- Products will be loaded here by JS -->
+        </div>
+
+        <!-- Total Section (Moved back here) -->
+        <div class="total-section">
+            Total: <span id="total-price">0</span> SEK
+        </div>
+
+        <!-- Phone Input Section -->
+        <div class="phone-input-section">
+            <label for="phone-number">Phone Number (for unlock code)</label>
+            <input type="tel" id="phone-number" name="phone-number"
+                   placeholder="07XXXXXXXX" required
+                   pattern="07[0-9]{8}"
+                   title="Enter a 10-digit Swedish mobile number starting with 07"
+                   inputmode="tel">
+             <span class="phone-hint">Used only to send the unlock code.</span>
+        </div>
+
+        <!-- Payment Button (Moved back here) -->
+        <button id="payment-button" disabled><span>Visa betalningsinfo</span></button>
+
+        <!-- Payment Info Section -->
+        <div id="payment-info">
+            <h3>Payment Instructions</h3>
+            <div id="selected-items-summary">
+                <h4>Your Selection:</h4>
+                <ul><!-- Selected items will be listed here --></ul>
+            </div>
+            <p class="final-amount">Amount: <span id="payment-amount">--</span> SEK</p>
+            <p class="swish-number">Swish payment to: 070-4228605</p>
+            <p><strong>Important:</strong> Enter your phone number (<span id="phone-display"></span>) as the message.</p>
+            <p>We will send the unlock code via SMS once payment is received.</p>
+            <p><strong>After retrieving your item, please close the box and reset the lock to 000.</strong></p>
+            <button id="cancel-payment">Change Selection</button>
+        </div>
+    </div>
+
+    <!-- Sticky Action Footer REMOVED -->
+    <!-- Elements moved back into .container -->
+
+    <footer>
+        Powered by nomapod
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const products = [
+                { id: 'prod1', name: 'Coca Cola Zero', price: 20, imgSrc: 'Coca-Cola_Zero.jpg.webp' },
+                { id: 'prod2', name: 'Nocco', price: 20, imgSrc: 'PB-3542_1.jpg.webp' },
+                { id: 'prod3', name: 'Barebell Protein Bar', price: 25, imgSrc: 'Barebell.jpg.webp' },
+                { id: 'prod4', name: 'Gott och Blandat', price: 20, imgSrc: 'GottoBlandat.jpg.webp' }
+            ];
+
+            // Get references to elements (unchanged IDs)
+            const productListElement = document.getElementById('product-list');
+            const totalPriceElement = document.getElementById('total-price');
+            const phoneInput = document.getElementById('phone-number');
+            const paymentButton = document.getElementById('payment-button');
+            const paymentButtonText = paymentButton.querySelector('span'); // Get text span for loading state
+            const paymentInfoSection = document.getElementById('payment-info');
+            const paymentAmountElement = document.getElementById('payment-amount');
+            const phoneDisplayElement = document.getElementById('phone-display');
+            const selectedItemsListElement = paymentInfoSection.querySelector('ul');
+            const cancelPaymentButton = document.getElementById('cancel-payment');
+
+            // Load products into the list
+            products.forEach(product => {
+                const label = document.createElement('label');
+                label.htmlFor = product.id;
+                // Add tabindex for keyboard focusability
+                label.tabIndex = 0;
+                label.addEventListener('keydown', (e) => {
+                    // Allow selection with Space or Enter key
+                    if (e.code === 'Space' || e.code === 'Enter') {
+                        e.preventDefault(); // Prevent default space scroll/enter submit
+                        checkbox.checked = !checkbox.checked;
+                        // Manually trigger change event
+                        checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                });
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = product.id;
+                checkbox.name = 'product';
+                checkbox.value = product.price;
+                checkbox.dataset.name = product.name;
+                // Hide actual checkbox visually, use label styling
+                // checkbox.style.display = 'none'; // Optional: hide checkbox if label click sufficient
+
+                const img = document.createElement('img');
+                img.src = product.imgSrc;
+                img.alt = "";
+                img.className = 'product-image';
+                // Handle image loading errors gracefully
+                img.onerror = () => { img.style.display = 'none'; };
+
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'product-name';
+                nameSpan.textContent = product.name;
+
+                const priceSpan = document.createElement('span');
+                priceSpan.className = 'product-price';
+                priceSpan.textContent = `${product.price} SEK`;
+
+                label.appendChild(checkbox);
+                label.appendChild(img);
+                label.appendChild(nameSpan);
+                label.appendChild(priceSpan);
+                productListElement.appendChild(label);
+
+                // Add event listener to each checkbox change
+                checkbox.addEventListener('change', () => {
+                    label.classList.toggle('selected-product', checkbox.checked);
+                    updateState();
+                });
+            });
+
+            // Add event listener to phone input
+            phoneInput.addEventListener('input', updateState);
+
+            // Add event listener to payment button
+            paymentButton.addEventListener('click', () => {
+                if (!paymentButton.disabled && !paymentButton.classList.contains('loading')) {
+                    // Add loading state
+                    paymentButton.classList.add('loading');
+                    // paymentButtonText.textContent = 'Laddar...'; // Alternative text change
+
+                    // Simulate slight delay before showing info
+                    setTimeout(() => {
+                        const currentTotal = calculateTotalPrice();
+                        paymentAmountElement.textContent = currentTotal;
+                        phoneDisplayElement.textContent = phoneInput.value;
+
+                        // Update selected items summary
+                        selectedItemsListElement.innerHTML = '';
+                        const selectedCheckboxes = getSelectedCheckboxes();
+                        if (selectedCheckboxes.length > 0) {
+                            selectedCheckboxes.forEach(cb => {
+                                const li = document.createElement('li');
+                                li.textContent = `${cb.dataset.name} - ${cb.value} SEK`;
+                                selectedItemsListElement.appendChild(li);
+                            });
+                            paymentInfoSection.querySelector('#selected-items-summary').style.display = 'block';
+                        } else {
+                            paymentInfoSection.querySelector('#selected-items-summary').style.display = 'none';
+                        }
+
+                        paymentInfoSection.classList.add('visible');
+
+                        // Remove loading state after showing info
+                        paymentButton.classList.remove('loading');
+                        // paymentButtonText.textContent = 'Visa betalningsinfo';
+
+                        // Optional: Scroll to payment info if needed
+                        // paymentInfoSection.scrollIntoView({ behavior: 'smooth' });
+
+                    }, 300); // 300ms simulated delay
+                }
+            });
+
+             // Add event listener to cancel button
+            cancelPaymentButton.addEventListener('click', () => {
+                paymentInfoSection.classList.remove('visible');
+            });
+
+            // --- Helper Functions ---
+             function getSelectedCheckboxes() {
+                return productListElement.querySelectorAll('input[type="checkbox"]:checked');
+            }
+            function calculateTotalPrice() {
+                let total = 0;
+                getSelectedCheckboxes().forEach(checkbox => {
+                    total += parseInt(checkbox.value, 10);
+                });
+                return total;
+            }
+            function updateState() {
+                const currentTotal = calculateTotalPrice();
+                const oldTotal = parseInt(totalPriceElement.textContent || '0', 10);
+
+                // Update total with potential animation/highlight (simple example)
+                totalPriceElement.textContent = currentTotal;
+                if (currentTotal !== oldTotal) {
+                    totalPriceElement.style.transition = 'none'; // Disable transition for reset
+                    totalPriceElement.style.transform = 'scale(1.1)';
+                    totalPriceElement.style.color = 'var(--primary-color)';
+                    setTimeout(() => {
+                        totalPriceElement.style.transition = 'transform 0.2s ease, color 0.2s ease'; // Re-enable
+                        totalPriceElement.style.transform = 'scale(1)';
+                        totalPriceElement.style.color = ''; // Revert color
+                    }, 50);
+                }
+
+                const phoneNumber = phoneInput.value.trim();
+                const isPhoneEntered = phoneNumber !== '';
+                const isProductSelected = currentTotal > 0;
+
+                paymentButton.disabled = !(isProductSelected && isPhoneEntered);
+
+                if (paymentInfoSection.classList.contains('visible') && !(isProductSelected && isPhoneEntered)) {
+                   paymentInfoSection.classList.remove('visible');
+                }
+            }
+
+            // Initial state update
+            updateState();
+        });
+    </script>
+
+</body>
+</html>
