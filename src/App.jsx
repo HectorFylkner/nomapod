@@ -7,6 +7,7 @@ import PhoneInput from './components/PhoneInput';
 import PaymentInfo from './components/PaymentInfo';
 import Footer from './components/Footer';
 import AnimatedBackground from './components/AnimatedBackground';
+import { useWindowSize } from 'react-use';
 import './App.css';
 
 const NUM_SKELETONS = 4;
