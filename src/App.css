@@ -305,10 +305,10 @@ h2 {
 .payment-flipper-back {
   position: absolute; /* Ensure back face IS absolute */
   transform: rotateY(180deg);
-  display: flex;
-  flex-direction: column;
+  /* Remove flexbox from the back face itself */
+  /* display: flex; */
+  /* flex-direction: column; */
   background-color: var(--card-background); 
-  /* min-height: 100%; Remove */
   /* height: 100% is set above */
 }
 
@@ -319,8 +319,10 @@ h2 {
     padding: 20px;
     width: 100%;
     box-sizing: border-box;
-    flex-grow: 1; /* Allow payment info to take space within flex */
+    /* flex-grow: 1; Remove flex-grow */
     overflow-y: auto; /* Add scroll if content exceeds fixed height */
+    /* Make sure height isn't constrained to 0 somehow */
+    min-height: 1px; /* Ensure it has at least some render height */
 }
 
 .payment-info h3 {
