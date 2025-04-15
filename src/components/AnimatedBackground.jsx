@@ -18,48 +18,62 @@ function AnimatedBackground() {
         // Optional: callback when particles container is loaded
     }, []);
 
-    // Example subtle configuration (can be customized extensively)
-    // Find more presets: https://particles.js.org/samples/presets/
+    // Basic manual configuration instead of preset
     const options = {
-        // Using a preset for simplicity, e.g., "nasa"
-        // Remove preset and manually define options for more control
-        preset: "nasa", // Other simple options: "stars", "snow"
         background: {
-            // Use a transparent background so the CSS background shows through if needed,
-            // or define a background color here for the canvas itself.
             color: { 
-                value: 'transparent' // Make canvas background transparent
+                value: 'transparent' // Keep transparent background
             },
         },
+        fpsLimit: 60, // Limit FPS for performance
         particles: {
-            // Lower particle density for performance
+            color: {
+                value: "#cccccc" // Simple grey particles
+            },
+            links: {
+                color: "#cccccc",
+                distance: 150,
+                enable: true,
+                opacity: 0.3,
+                width: 1
+            },
+            move: {
+                direction: "none",
+                enable: true,
+                outModes: {
+                    default: "bounce"
+                },
+                random: false,
+                speed: 1, // Slower speed
+                straight: false
+            },
             number: {
-                value: 50, // Reduced from nasa default (150)
                 density: {
                     enable: true,
-                    value_area: 800 // Keep density reasonable
-                }
+                    area: 800
+                },
+                value: 40 // Reduced number of particles
             },
-            // Reduce opacity
             opacity: {
-                value: 0.4, // Reduced from nasa default (0.5)
+                value: 0.3 // Subtle opacity
             },
-            // Slow down movement slightly
-            move: {
-                speed: 0.8, // Reduced from nasa default (1)
+            shape: {
+                type: "circle"
+            },
+            size: {
+                value: { min: 1, max: 3 } // Small particles
             }
         },
-        // Ensure it doesn't interfere with clicks on main content
         interactivity: {
             events: {
-              onclick: { enable: false }, // Disable click interactions
-              onhover: { enable: false }  // Disable hover interactions
+              onclick: { enable: false },
+              onhover: { enable: false }
             },
         },
-        detectRetina: true, // Adjusts density for high-res screens
+        detectRetina: true,
         fullScreen: { 
             enable: true, 
-            zIndex: -1 // Crucial: Place canvas behind all other content
+            zIndex: -1 // Keep behind content
         }
     };
 
