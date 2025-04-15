@@ -1,0 +1,83 @@
+:root {
+  /* Define CSS variables based on styles.css */
+  --background-color: #f8f9fa;
+  --text-color: #212529;
+  --primary-color: #4e5d6c;
+  --border-color: #dee2e6;
+  --disabled-color: #adb5bd;
+  --card-background: #ffffff;
+  --selected-bg-color: #eef2f7;
+  --error-color: #dc3545;
+  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+
+  /* Font synthesis and rendering optimizations */
+  font-family: var(--font-family);
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light;
+  color: var(--text-color);
+  background-color: var(--background-color);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+    box-sizing: border-box;
+}
+*,
+*::before,
+*::after {
+    box-sizing: inherit;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+  /* background-color: var(--background-color); handled by :root */
+  /* color: var(--text-color); handled by :root */
+  /* font-family: var(--font-family); handled by :root */
+  display: flex;
+  flex-direction: column; /* Ensure App takes full height */
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+  padding: 20px; /* Replicate body padding from original */
+}
+
+#root {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center App component */
+}
+
+/* Add other global resets or base styles if needed */
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  font-size: 1em;
+  font-weight: 500;
+  background-color: #f9f9f9;
+  transition: border-color 0.25s;
+}
+
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+/* Basic link styling */
+a {
+  font-weight: 500;
+  color: var(--primary-color);
+  text-decoration: inherit;
+}
+a:hover {
+  color: #3b4754;
+} 
