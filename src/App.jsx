@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import Header from './components/Header';
 import ProductList from './components/ProductList';
 import ProductSkeleton from './components/ProductSkeleton';
@@ -19,6 +19,9 @@ function App() {
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
   const [productError, setProductError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPulse, setShowPulse] = useState(false);
+
+  const prevCanProceedRef = useRef();
 
   // Fetch products on mount
   useEffect(() => {
@@ -81,6 +84,17 @@ function App() {
 
   // Determine if payment button should be enabled
   const canProceedToPayment = selectedProductIds.length > 0 && isPhoneValid;
+
+  // Effect to trigger pulse animation when button becomes enabled
+  useEffect(() => {
+    const prevCanProceed = prevCanProceedRef.current;
+    if (!prevCanProceed && canProceedToPayment) {
+      setShowPulse(true);
+      const timer = setTimeout(() => setShowPulse(false), 1500);
+      return () => clearTimeout(timer);
+    }
+    prevCanProceedRef.current = canProceedToPayment;
+  }, [canProceedToPayment]);
 
   // Handle showing payment info
   const handleShowPaymentInfo = () => {
@@ -156,7 +170,7 @@ function App() {
 
             {!showPaymentInfo && (
                 <button 
-                    className={`payment-button ${isSubmitting ? 'loading' : ''}`}
+                    className={`payment-button ${isSubmitting ? 'loading' : ''} ${showPulse ? 'pulse-enable' : ''}`}
                     onClick={handleShowPaymentInfo}
                     disabled={!canProceedToPayment || isSubmitting}
                     title={paymentButtonTitle}
