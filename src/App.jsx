@@ -168,28 +168,31 @@ function App() {
               phoneHasInput={phoneHasInput}
             />
 
-            <div className={`payment-flipper-container ${showPaymentInfo ? 'show-back' : ''}`}>
-              <div className="payment-flipper">
-                <div className="payment-flipper-front">
-                  <button 
-                      className={`payment-button ${isSubmitting ? 'loading' : ''} ${showPulse ? 'pulse-enable' : ''}`}
-                      onClick={handleShowPaymentInfo}
-                      disabled={!canProceedToPayment || isSubmitting}
-                      title={paymentButtonTitle}
-                  >
-                      <span>Show Payment Info</span>
-                  </button>
+            {/* Container for Button */} 
+            <div className={`payment-button-container ${showPaymentInfo ? 'hidden' : ''}`}>
+                <div className="payment-button-wrapper">
+                    <button 
+                        className={`payment-button ${isSubmitting ? 'loading' : ''} ${showPulse ? 'pulse-enable' : ''}`}
+                        onClick={handleShowPaymentInfo}
+                        disabled={!canProceedToPayment || isSubmitting}
+                        title={paymentButtonTitle}
+                    >
+                        <span>Show Payment Info</span>
+                    </button>
                 </div>
-                <div className="payment-flipper-back">
-                  <PaymentInfo 
-                    products={products}
-                    selectedProductIds={selectedProductIds}
-                    totalPrice={totalPrice}
-                    phoneNumber={phoneNumber}
-                    onCancel={handleCancelPayment}
-                  />
-                </div>
-              </div>
+            </div>
+
+            {/* Payment Info Wrapper for slide/fade transition */} 
+            <div className={`payment-info-wrapper ${showPaymentInfo ? 'visible' : ''}`}> 
+              {/* Conditionally render PaymentInfo OR always render and rely on CSS hide/show? 
+                  Let's always render to ensure smooth transitions */}
+              <PaymentInfo 
+                products={products}
+                selectedProductIds={selectedProductIds}
+                totalPrice={totalPrice}
+                phoneNumber={phoneNumber}
+                onCancel={handleCancelPayment}
+              />
             </div>
           </>
         )}

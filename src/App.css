@@ -255,82 +255,57 @@ h2 {
     }
 }
 
-/* Card Flip Styles */
-.payment-flipper-container {
-  perspective: 1000px;
-  margin-top: 20px;
-  position: relative;
-  width: 100%;
-  max-width: 400px;
-  min-height: 400px; /* Give fixed min-height to accommodate back */
-  /* background: lightblue; */ /* Debugging */
+/* Payment Info Reveal Styles */
+.payment-button-container, /* Container for the button (and maybe info wrapper) */
+.payment-info-container {
+    position: relative; /* Needed if managing absolute positioning inside */
+    width: 100%;
+    max-width: 400px; /* Match container width */
 }
 
-.payment-flipper {
-  position: relative; /* Keep relative for absolute children */
-  width: 100%;
-  height: 100%; /* Fill the container */
-  /* Update timing function and add scale to transition properties */
-  transition: transform 0.7s ease-in-out, box-shadow 0.7s ease-in-out;
-  transform-style: preserve-3d;
-  /* Add a subtle shadow for depth */
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+.payment-button-wrapper {
+    transition: opacity 0.3s ease-in-out;
+    opacity: 1;
 }
 
-/* Apply flip transform when container has .show-back */
-.payment-flipper-container.show-back .payment-flipper {
-  /* Combine rotateY with a slight scale down */
-  transform: rotateY(180deg) scale(0.98);
-  /* Slightly enhance shadow when flipped? Optional. */
-  box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+.payment-button-wrapper.hidden {
+    opacity: 0;
+    pointer-events: none; /* Prevent interaction when hidden */
 }
 
-.payment-flipper-front,
-.payment-flipper-back {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  /* height: 100%; Let height be determined by content on back */
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  /* overflow: hidden; Remove overflow on faces */
-  border-radius: 8px; /* Apply rounding to faces */
+.payment-info-wrapper {
+    /* Wrapper to handle smooth transition */
+    transition: max-height 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), /* Smoother ease */
+                opacity 0.4s ease-in-out,
+                transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                margin-top 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-15px); /* Start slightly higher */
+    overflow: hidden;
+    margin-top: 0;
+    border-radius: 8px; /* Apply rounding to wrapper */
+    /* Add shadow for separation */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08); 
 }
 
-.payment-flipper-front {
-  position: relative; /* Revert front face to relative */
-  z-index: 2;
-  /* Remove flex centering - button is block level */
-  /* display: flex; */
-  /* align-items: center; */
-  /* justify-content: center; */
-  /* background: lightcoral; */ /* Debugging */
-}
-
-.payment-flipper-back {
-  position: absolute; /* Ensure back face IS absolute */
-  transform: rotateY(180deg);
-  /* Re-add flexbox to manage internal layout */
-  display: flex;
-  flex-direction: column;
-  background-color: var(--card-background); 
-  /* Remove height: 100% - let content define height */
-  /* height: 100% is set above */
+.payment-info-wrapper.visible {
+    max-height: 1000px; /* Large enough to fit content */
+    opacity: 1;
+    transform: translateY(0);
+    margin-top: 30px; /* Space above */
 }
 
 /* Adjust original .payment-info styles */
 .payment-info {
-    border: none;
-    border-radius: 8px; 
-    padding: 20px;
+    border: none; 
+    border-radius: 8px; /* Already rounded by wrapper */
+    background-color: var(--card-background); /* Use card bg */
+    padding: 25px; /* Match container padding */
     width: 100%;
     box-sizing: border-box;
-    /* Re-add flex-grow to fill space in flex parent */
-    flex-grow: 1;
-    overflow-y: auto; /* Keep scroll for potential overflow */
-    /* Remove min-height safeguard */
-    /* min-height: 1px; */ 
+    flex-grow: 1; 
+    overflow-y: auto;
 }
 
 .payment-info h3 {
