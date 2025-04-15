@@ -1,6 +1,6 @@
 import React from 'react';
 
-function ProductItem({ product, index, isSelected, onSelectionChange }) {
+function ProductItem({ product, index, isSelected, onSelectionChange, isHighlighted }) {
 
   const handleChange = () => {
     onSelectionChange(product.id, !isSelected);
@@ -22,6 +22,8 @@ function ProductItem({ product, index, isSelected, onSelectionChange }) {
   return (
     // Apply inline style for animation delay to the wrapper
     <div className="product-item" style={{ animationDelay }}> 
+      {/* Conditionally render the highlight badge */} 
+      {isHighlighted && <span className="highlight-badge">Popular</span>}
       <label htmlFor={product.id} className={labelClasses} tabIndex={0} onKeyDown={handleKeyDown}>
         <input
           type="checkbox"

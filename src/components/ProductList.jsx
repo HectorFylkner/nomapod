@@ -1,7 +1,7 @@
 import React from 'react';
 import ProductItem from './ProductItem';
 
-function ProductList({ products, selectedProducts, onSelectionChange }) {
+function ProductList({ products, selectedProducts, onSelectionChange, highlightedProductId }) {
   return (
     <div className="product-list">
       {products.map((product, index) => (
@@ -11,6 +11,7 @@ function ProductList({ products, selectedProducts, onSelectionChange }) {
           index={index}
           isSelected={selectedProducts.includes(product.id)}
           onSelectionChange={onSelectionChange}
+          isHighlighted={product.id === highlightedProductId}
         />
       ))}
     </div>

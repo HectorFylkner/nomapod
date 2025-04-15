@@ -455,4 +455,62 @@ h2 {
   padding: 20px 25px; /* Re-apply padding inside */
   /* border-top: 1px solid var(--border-color); */ /* Optional separator */
   /* border-bottom: 1px solid var(--border-color); */ /* Optional separator */
+}
+
+/* Greeting Style */
+.time-greeting {
+  text-align: center;
+  color: var(--primary-color);
+  font-size: 0.95em;
+  margin-bottom: 25px; /* Space below greeting */
+  margin-top: -20px; /* Pull up slightly below logo */
+  font-weight: 500;
+}
+
+/* Highlight Badge */
+.product-item .highlight-badge {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: var(--primary-color);
+  color: white;
+  font-size: 0.65em;
+  font-weight: 600;
+  padding: 2px 5px;
+  border-radius: 4px;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  z-index: 3; /* Ensure above other elements */
+}
+
+/* Smart Hint Style */
+.smart-hint {
+  text-align: right;
+  font-size: 0.85em;
+  color: var(--primary-color);
+  margin-top: -15px; /* Pull up below total */
+  margin-bottom: 15px; /* Space before phone input */
+  font-style: italic;
+  min-height: 1.3em; /* Reserve space */
+}
+
+/* Payment Info Styles */
+
+/* Keyframes for subtle bounce/attention */
+@keyframes attentionBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+.payment-cue {
+  display: inline-block;
+  margin-left: 4px;
+  font-size: 1.1em; /* Make icon slightly larger */
+  vertical-align: middle; /* Align with text */
+}
+
+.payment-cue.phone-cue {
+  animation: attentionBounce 1.5s ease-in-out infinite;
+  animation-delay: 0.5s; /* Start animation slightly delayed */
 } 
