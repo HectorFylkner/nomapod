@@ -29,7 +29,7 @@ function ProductItem({ product, isSelected, onSelectionChange }) {
           data-name={product.name} // Keep data attribute if needed elsewhere, though props are better
         />
         <img 
-          src={`/${product.imgSrc}`} 
+          src={`${import.meta.env.BASE_URL}${product.imgSrc}`}
           alt={product.altText} 
           className="product-image" 
           onError={(e) => e.target.style.display = 'none'} // Handle img error
