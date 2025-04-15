@@ -528,12 +528,14 @@
                 }
 
                 const phoneNumber = phoneInput.value.trim();
-                const isPhoneEntered = phoneNumber !== '';
+                // Check length and pattern validity instead of just checking if empty
+                const isPhoneValid = phoneNumber.length === 10 && phoneInput.checkValidity();
                 const isProductSelected = currentTotal > 0;
 
-                paymentButton.disabled = !(isProductSelected && isPhoneEntered);
+                paymentButton.disabled = !(isProductSelected && isPhoneValid);
 
-                if (paymentInfoSection.classList.contains('visible') && !(isProductSelected && isPhoneEntered)) {
+                // Hide payment info if conditions are no longer met
+                if (paymentInfoSection.classList.contains('visible') && !(isProductSelected && isPhoneValid)) {
                    paymentInfoSection.classList.remove('visible');
                 }
             }
