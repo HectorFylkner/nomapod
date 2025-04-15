@@ -170,6 +170,12 @@ h2 {
     box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.2);
 }
 
+/* Style for explicitly marking invalid phone input via JS */
+.phone-input-section input[type="tel"].input-error {
+    border-color: var(--error-color);
+    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.2); /* Optional: keep consistent shadow */
+}
+
 .phone-hint {
     font-size: 0.8em;
     color: #6c757d;
