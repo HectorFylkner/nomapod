@@ -1,80 +1,117 @@
-# nomapod - MVP Payment Landing Page
+# nomapod - Payment UI (React Version)
 
 ## Description
 
-This project contains a simple, mobile-first, single-page web application designed as the Minimum Viable Product (MVP) payment landing page for nomapod. It's intended to be accessed by users scanning a QR code on a physical nomapod unit.
+This project contains the React-based frontend for the nomapod payment interface. It provides a simple, mobile-first, single-page application designed as the user interface for purchasing items from a nomapod unit. It's intended to be accessed by users scanning a QR code on the physical unit.
 
 The page allows users to:
-1.  Select one or more products available in the pod.
-2.  See the total price dynamically update.
-3.  Enter their phone number.
-4.  View manual payment instructions for Swish.
+1.  View available products loaded dynamically.
+2.  Select one or more products.
+3.  See the total price update in real-time.
+4.  Enter their phone number (Swedish format validation).
+5.  View manual payment instructions for Swish, including the total amount and required Swish message content.
 
-**Important:** This frontend-only application **simulates** the user flow. It **does not** handle actual payment processing, Swish integration, payment verification, or sending SMS unlock codes. These processes are assumed to be handled manually for the MVP stage.
+**Important:** This frontend application **simulates** the user flow. It **does not** handle actual payment processing, Swish integration, payment verification, or sending SMS unlock codes. These processes are assumed to be handled manually or by a separate backend system for the MVP stage.
 
 ## Purpose
 
-The primary goal is to provide a functional user interface for the initial purchase flow, guiding the user through product selection and providing the necessary information to complete a manual Swish payment. It serves to validate the basic user experience before implementing backend logic.
+The primary goal is to provide a functional and maintainable user interface for the purchase flow, guiding the user through product selection and providing the necessary information to complete a manual Swish payment. This version uses React and Vite for improved structure, maintainability, and developer experience compared to the original static HTML version.
 
 ## Features
 
-*   Dynamic product list loaded from embedded data.
+*   Component-based UI built with React.
+*   Fast development server and optimized build process powered by Vite.
+*   Dynamic product list loaded from `/public/products.json`.
 *   Checkbox-based multiple product selection.
-*   Real-time calculation and display of the total price.
-*   Required phone number input with basic HTML5 validation hints.
-*   "Visa betalningsinfo" (Show Payment Info) button enabled only when products are selected and a phone number is entered.
-*   Reveals a section with:
+*   Real-time calculation and display of the total price with visual feedback on change.
+*   Required phone number input with client-side validation (10 digits, Swedish format).
+*   Visual feedback for invalid phone number input.
+*   "Show Payment Info" button enabled only when products are selected and a valid phone number is entered.
+*   Tooltip on disabled payment button explaining requirements.
+*   Reveals a payment instruction section with:
     *   A summary of the selected items.
     *   The total amount to pay.
-    *   The designated Swish number.
+    *   The designated Swish number (configured in `src/components/PaymentInfo.jsx` or ideally a central config).
     *   Instructions for the user (include phone number in message, wait for SMS code).
     *   Reminder to close the box and reset the lock after purchase.
 *   Minimalist, responsive design optimized for mobile devices.
-*   Subtle UI animations and visual feedback for user interactions.
 
 ## Technology Stack
 
-*   **HTML5:** Standard semantic structure.
-*   **CSS3:** Embedded styles for layout, responsiveness, and minimal aesthetics. Uses CSS variables.
-*   **Vanilla JavaScript (ES6+):** For dynamic content loading, UI updates, state management, and event handling. No external libraries or frameworks.
+*   **React:** JavaScript library for building user interfaces.
+*   **Vite:** Fast frontend build tool and development server.
+*   **JavaScript (ES6+):** Core language for application logic.
+*   **CSS3:** Styling with CSS Variables, organized via CSS Modules or global stylesheets (`src/App.css`, `src/index.css`).
+*   **HTML5:** Structure provided by `index.html` and JSX within React components.
 
-## Project Files
+## Project Structure
 
-*   `nomapod_pay3.html`: The main HTML file containing the structure, embedded CSS, and JavaScript.
-*   `nomapod.png`: The logo image file.
-*   `*.webp`/`*.jpg`: Product image files (e.g., `Coca-Cola_Zero.jpg.webp`, `Barebell.jpg.webp`, etc.)
+*   **`public/`**: Contains static assets that are copied directly to the build output.
+    *   `products.json`: Default product data.
+    *   `nomapod.png`: Logo.
+    *   `*.webp`: Product images.
+*   **`src/`**: Contains the React application source code.
+    *   `main.jsx`: Application entry point.
+    *   `App.jsx`: Main application component managing state and layout.
+    *   `App.css`, `index.css`: CSS files.
+    *   **`components/`**: Directory containing reusable React components (e.g., `ProductList`, `PhoneInput`).
+*   **`index.html`**: The main HTML template Vite uses.
+*   **`package.json`**: Project metadata and dependencies.
+*   **`vite.config.js`**: Vite configuration file.
+*   **`.gitignore`**: Specifies intentionally untracked files for Git.
 
-## Setup & Local Testing
+## Local Development
 
-No build process is required. To test locally:
-
-1.  **Ensure all files** (`nomapod_pay3.html` and all required image files) are in the same directory.
-2.  **Navigate** to this directory in your terminal.
-3.  **Start a simple web server.** Python 3 is recommended:
+1.  **Prerequisites:** Node.js (which includes npm) installed.
+2.  **Clone Repository:** `git clone <repository-url>`
+3.  **Navigate:** `cd nomapod-website` (or your repository directory name)
+4.  **Install Dependencies:**
     ```bash
-    python3 -m http.server 8080
+    npm install
     ```
-    (Use any available port if 8080 is taken).
-4.  **Open your browser** and go to `http://localhost:8080/nomapod_pay3.html`.
-5.  **To test on a mobile device:**
-    *   Ensure the device is on the same Wi-Fi network as the computer running the server (avoid Guest networks, use Personal Hotspot if needed).
-    *   Find your computer's local IP address (e.g., using `ipconfig getifaddr en0` on macOS).
-    *   Access `http://[YOUR_COMPUTER_IP]:8080/nomapod_pay3.html` from the mobile browser.
+5.  **Run Development Server:**
+    ```bash
+    npm run dev
+    ```
+    This will start the Vite dev server (typically at `http://localhost:5173`). The application will automatically reload when you save changes.
+
+## Building for Production
+
+To create an optimized build for deployment:
+
+```bash
+npm run build
+```
+This command generates a `dist` directory containing the static HTML, CSS, and JavaScript files ready for deployment.
 
 ## Deployment
 
-As this is a static site (HTML, CSS, JS, images only), it can be easily deployed to various static hosting platforms:
+This React/Vite application requires a **build step** before deployment.
 
-*   **Netlify:** Drag-and-drop the project folder or connect a Git repository.
-*   **Vercel:** Connect a Git repository.
-*   **GitHub Pages:** Enable Pages deployment directly from a GitHub repository.
-*   **Cloudflare Pages:** Connect a Git repository.
+**GitHub Pages Deployment (Recommended):**
 
-These platforms often offer generous free tiers suitable for this type of project and provide HTTPS automatically.
+1.  **Configure GitHub Pages:** In your repository settings under "Pages", ensure the source is set to "GitHub Actions".
+2.  **Add GitHub Actions Workflow:** Create a file named `.github/workflows/deploy.yml` with the appropriate workflow steps to build and deploy your Vite application. This typically involves:
+    *   Checking out the code.
+    *   Setting up Node.js.
+    *   Running `npm install`.
+    *   Running `npm run build`.
+    *   Using an action (like `peaceiris/actions-gh-pages`) to deploy the contents of the `dist` directory to the `gh-pages` branch or directly to GitHub Pages.
+
+    *(Refer to the [Vite documentation for deploying to GitHub Pages](https://vitejs.dev/guide/static-deploy.html#github-pages) for specific workflow examples.)*
+
+**Other Static Hosting Platforms (Netlify, Vercel, Cloudflare Pages, etc.):**
+
+1.  Connect your GitHub repository to the hosting provider.
+2.  Configure the build settings:
+    *   **Build Command:** `npm run build`
+    *   **Publish Directory:** `dist`
+
+These platforms will typically automatically detect Vite, install dependencies, run the build command, and deploy the resulting `dist` directory.
 
 ## Customization
 
-*   **Products:** Edit the `products` array in the JavaScript section of `nomapod_pay3.html` to change names, prices, or image paths.
-*   **Swish Number:** Update the Swish number displayed within the `#payment-info` section in the HTML and potentially in the JavaScript if needed elsewhere.
-*   **Styling:** Modify CSS variables in the `:root` section or specific CSS rules within the `<style>` tags.
-*   **Logo:** Replace the `nomapod.png` file or update the `src` attribute of the logo `<img>` tag. 
+*   **Products:** Modify the `/public/products.json` file to change product details, prices, or images.
+*   **Swish Number:** Update the `SWISH_NUMBER` constant, currently located within `src/components/PaymentInfo.jsx`. Consider moving this to a dedicated configuration file (e.g., `src/config.js`) for better organization.
+*   **Styling:** Modify CSS variables in `src/index.css` or component-specific styles in `src/App.css`.
+*   **Logo:** Replace the `/public/nomapod.png` file. 
