@@ -6,6 +6,7 @@ import TotalDisplay from './components/TotalDisplay';
 import PhoneInput from './components/PhoneInput';
 import PaymentInfo from './components/PaymentInfo';
 import Footer from './components/Footer';
+import AnimatedBackground from './components/AnimatedBackground';
 import './App.css';
 
 const NUM_SKELETONS = 4;
@@ -138,6 +139,7 @@ function App() {
 
   return (
     <>
+      <AnimatedBackground />
       <div className="container">
         <Header />
         
