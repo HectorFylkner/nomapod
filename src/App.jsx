@@ -22,10 +22,12 @@ function App() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        // Ensure products.json is in the public folder for Vite
-        const response = await fetch('/products.json'); 
+        // Construct path relative to the base URL for deployment
+        const productsPath = `${import.meta.env.BASE_URL}products.json`; 
+        console.log("Fetching products from:", productsPath); // Add log for debugging
+        const response = await fetch(productsPath); 
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          throw new Error(`HTTP error! status: ${response.status} ${response.statusText}`);
         }
         const data = await response.json();
         setProducts(data);
