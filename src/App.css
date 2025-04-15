@@ -20,11 +20,12 @@
 }
 
 h2 {
-    font-size: 1.1em;
-    margin-bottom: 15px;
+    font-size: 1.2em;
+    font-weight: 600;
+    margin-bottom: 20px;
     color: var(--text-color);
     border-bottom: 1px solid var(--border-color);
-    padding-bottom: 8px;
+    padding-bottom: 10px;
     text-align: center;
 }
 
@@ -32,6 +33,25 @@ h2 {
 .product-list {
     /* Container for product items */
     margin-bottom: 20px; /* Space before total */
+}
+
+/* Animation for list items */
+@keyframes fadeInSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.product-item {
+  /* Apply animation - duration and timing function */
+  animation: fadeInSlideUp 0.5s ease-out forwards;
+  opacity: 0; /* Start hidden for animation */
+  /* animation-delay will be set via inline style */
 }
 
 .product-item label {
@@ -89,6 +109,7 @@ h2 {
 
 .product-price {
     font-weight: 500;
+    font-size: 0.95em;
     margin-left: 10px;
     flex-shrink: 0;
     color: var(--primary-color);
@@ -247,7 +268,8 @@ h2 {
 
 .payment-info h3 {
     margin-top: 0;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
+    font-weight: 600;
     color: var(--primary-color);
     text-align: center;
 }
@@ -255,7 +277,7 @@ h2 {
     font-size: 0.95em;
     color: var(--text-color);
     text-align: center;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     font-weight: 600;
 }
 

@@ -1,23 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
 :root {
   /* Define CSS variables based on styles.css */
   --background-color: #f8f9fa;
+  --background-color-light: #ffffff; /* Lighter shade for gradient */
   --text-color: #212529;
   --primary-color: #4e5d6c;
   --border-color: #dee2e6;
   --disabled-color: #adb5bd;
   --card-background: #ffffff;
-  --selected-bg-color: #eef2f7;
+  --selected-bg-color: #e9f2fa; /* Slightly adjusted selected bg */
   --error-color: #dc3545;
-  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  /* Apply Inter font globally */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 
   /* Font synthesis and rendering optimizations */
   font-family: var(--font-family);
-  line-height: 1.5;
+  line-height: 1.6; /* Slightly increase line height for readability */
   font-weight: 400;
 
   color-scheme: light;
   color: var(--text-color);
-  background-color: var(--background-color);
+  background-color: var(--background-color); /* Fallback */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -37,15 +41,14 @@ html {
 }
 
 body {
-  /* background-color: var(--background-color); handled by :root */
-  /* color: var(--text-color); handled by :root */
-  /* font-family: var(--font-family); handled by :root */
+  /* Add subtle background gradient */
+  background: linear-gradient(to bottom, var(--background-color) 0%, var(--background-color-light) 100%);
   display: flex;
-  flex-direction: column; /* Ensure App takes full height */
+  flex-direction: column;
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  padding: 20px; /* Replicate body padding from original */
+  padding: 20px;
 }
 
 #root {
@@ -55,21 +58,22 @@ body {
   align-items: center; /* Center App component */
 }
 
-/* Add other global resets or base styles if needed */
+/* Updated button base */
 button {
   font-family: inherit;
   cursor: pointer;
   border-radius: 5px;
   border: 1px solid transparent;
   font-size: 1em;
-  font-weight: 500;
-  background-color: #f9f9f9;
-  transition: border-color 0.25s;
+  font-weight: 500; 
+  /* background-color: #f9f9f9;  Let specific buttons define bg */
+  transition: border-color 0.25s, background-color 0.2s ease, transform 0.1s ease;
 }
 
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: 2px auto var(--primary-color); /* Adjusted focus ring */
+  outline-offset: 2px;
 }
 
 /* Basic link styling */

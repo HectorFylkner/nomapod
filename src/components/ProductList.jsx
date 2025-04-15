@@ -4,10 +4,11 @@ import ProductItem from './ProductItem';
 function ProductList({ products, selectedProducts, onSelectionChange }) {
   return (
     <div className="product-list">
-      {products.map(product => (
+      {products.map((product, index) => (
         <ProductItem 
           key={product.id}
           product={product}
+          index={index}
           isSelected={selectedProducts.includes(product.id)}
           onSelectionChange={onSelectionChange}
         />

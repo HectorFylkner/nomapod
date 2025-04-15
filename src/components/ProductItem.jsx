@@ -1,6 +1,6 @@
 import React from 'react';
 
-function ProductItem({ product, isSelected, onSelectionChange }) {
+function ProductItem({ product, index, isSelected, onSelectionChange }) {
 
   const handleChange = () => {
     onSelectionChange(product.id, !isSelected);
@@ -15,9 +15,13 @@ function ProductItem({ product, isSelected, onSelectionChange }) {
   };
 
   const labelClasses = `product-item-label ${isSelected ? 'selected-product' : ''}`;
+  
+  // Calculate stagger delay based on index
+  const animationDelay = `${index * 0.07}s`; // 70ms delay increment per item
 
   return (
-    <div className="product-item"> {/* Added wrapper div if needed */} 
+    // Apply inline style for animation delay to the wrapper
+    <div className="product-item" style={{ animationDelay }}> 
       <label htmlFor={product.id} className={labelClasses} tabIndex={0} onKeyDown={handleKeyDown}>
         <input
           type="checkbox"
