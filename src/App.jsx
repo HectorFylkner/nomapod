@@ -7,8 +7,6 @@ import PhoneInput from './components/PhoneInput';
 import PaymentInfo from './components/PaymentInfo';
 import Footer from './components/Footer';
 import AnimatedBackground from './components/AnimatedBackground';
-import ReactConfetti from 'react-confetti';
-import useWindowSize from 'react-use/lib/useWindowSize';
 import './App.css';
 
 const NUM_SKELETONS = 4;
@@ -23,13 +21,8 @@ function App() {
   const [productError, setProductError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPulse, setShowPulse] = useState(false);
-  const [priceDifference, setPriceDifference] = useState(0);
-  const [runConfetti, setRunConfetti] = useState(false);
 
   const prevCanProceedRef = useRef();
-  const prevTotalPriceRef = useRef(0);
-
-  const { width, height } = useWindowSize();
 
   // Fetch products on mount
   useEffect(() => {
@@ -84,19 +77,6 @@ function App() {
     }, 0);
   }, [selectedProductIds, products]);
 
-  // Effect to calculate price difference
-  useEffect(() => {
-    const currentTotal = totalPrice;
-    const prevTotal = prevTotalPriceRef.current;
-    const diff = currentTotal - prevTotal;
-    
-    if (diff !== 0) {
-        setPriceDifference(diff);
-    }
-    // Update ref for next comparison
-    prevTotalPriceRef.current = currentTotal;
-  }, [totalPrice]);
-
   // Validate phone number
   const isPhoneValid = useMemo(() => {
     const phoneRegex = /^07[0-9]{8}$/;
@@ -117,7 +97,7 @@ function App() {
     prevCanProceedRef.current = canProceedToPayment;
   }, [canProceedToPayment]);
 
-  // Handle showing payment info & trigger confetti
+  // Handle showing payment info
   const handleShowPaymentInfo = () => {
     if (!canProceedToPayment || isSubmitting) return;
 
@@ -125,15 +105,12 @@ function App() {
     setTimeout(() => {
         setShowPaymentInfo(true);
         setIsSubmitting(false);
-        // Trigger confetti
-        setRunConfetti(true); 
     }, 300);
   };
 
   // Handle cancelling/hiding payment info
   const handleCancelPayment = useCallback(() => {
     setShowPaymentInfo(false);
-    setRunConfetti(false); // Ensure confetti stops if cancelled early
   }, []);
 
   // Determine tooltip text for disabled payment button
@@ -163,20 +140,6 @@ function App() {
   return (
     <>
       <AnimatedBackground />
-      {runConfetti && 
-        <ReactConfetti 
-          width={width}
-          height={height}
-          recycle={false}
-          numberOfPieces={200}
-          gravity={0.15}
-          initialVelocityY={20}
-          onConfettiComplete={confetti => {
-              setRunConfetti(false);
-              confetti.reset();
-          }}
-        />
-      }
       <div className="container">
         <Header />
         
@@ -199,7 +162,7 @@ function App() {
 
         {!isLoadingProducts && (
           <div className="section-controls">
-            <TotalDisplay totalPrice={totalPrice} priceDifference={priceDifference} />
+            <TotalDisplay totalPrice={totalPrice} />
             <PhoneInput 
               phoneNumber={phoneNumber}
               onPhoneChange={handlePhoneChange}
