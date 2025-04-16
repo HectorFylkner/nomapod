@@ -7,20 +7,10 @@ import PhoneInput from './components/PhoneInput';
 import PaymentInfo from './components/PaymentInfo';
 import Footer from './components/Footer';
 import AnimatedBackground from './components/AnimatedBackground';
-import { useWindowSize } from 'react-use';
 import './App.css';
 
 const NUM_SKELETONS = 4;
 const HIGHLIGHTED_PRODUCT_ID = 'prod3'; // Example: Highlight Barebells
-
-// Helper function for greeting
-function getTimeOfDayGreeting() {
-  const hour = new Date().getHours();
-  if (hour < 5) return "Burning the midnight oil?";
-  if (hour < 12) return "Good morning! Ready for a pick-me-up?";
-  if (hour < 18) return "Good afternoon! Need a snack?";
-  return "Good evening! Late night craving?";
-}
 
 function App() {
   const [products, setProducts] = useState([]);
@@ -32,11 +22,8 @@ function App() {
   const [productError, setProductError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPulse, setShowPulse] = useState(false);
-  const [greeting, setGreeting] = useState('');
-  const [smartHint, setSmartHint] = useState('');
 
   const prevCanProceedRef = useRef();
-  const { width, height } = useWindowSize();
 
   // Fetch products on mount
   useEffect(() => {
@@ -60,11 +47,6 @@ function App() {
     };
 
     fetchProducts();
-  }, []);
-
-  // Set greeting on mount
-  useEffect(() => {
-    setGreeting(getTimeOfDayGreeting());
   }, []);
 
   // Handle product selection change
@@ -95,23 +77,6 @@ function App() {
       return total + (product ? product.price : 0);
     }, 0);
   }, [selectedProductIds, products]);
-
-  // Effect to update smart hint based on selection
-  useEffect(() => {
-    let hint = '';
-    const numItems = selectedProductIds.length;
-    if (numItems === 0) {
-      hint = ''; // No hint when nothing is selected
-    }
-    else if (numItems === 1 && totalPrice <= 20) {
-        hint = "Quick refuel!";
-    } else if (numItems > 2 && totalPrice > 40) {
-        hint = "Stocking up!";
-    } else if (numItems > 0) {
-        hint = "Nice choice!"; // Default positive hint
-    }
-    setSmartHint(hint);
-  }, [selectedProductIds, totalPrice]);
 
   // Validate phone number
   const isPhoneValid = useMemo(() => {
@@ -179,9 +144,6 @@ function App() {
       <div className="container">
         <Header />
         
-        {/* Render Greeting */} 
-        {greeting && <p className="time-greeting">{greeting}</p>}
-        
         <div className="section-products">
           <h2>Select Products</h2>
           <div className="product-list-container">
@@ -203,8 +165,6 @@ function App() {
         {!isLoadingProducts && (
           <div className="section-controls">
             <TotalDisplay totalPrice={totalPrice} /> 
-            {/* Render Smart Hint */} 
-            {smartHint && <p className="smart-hint">{smartHint}</p>}
             <PhoneInput 
               phoneNumber={phoneNumber}
               onPhoneChange={handlePhoneChange}

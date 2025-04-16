@@ -25,12 +25,10 @@ function PaymentInfo({ products, selectedProductIds, totalPrice, phoneNumber, on
       
       <p className="final-amount">Amount: <span>{totalPrice}</span> SEK</p>
       <p className="swish-number">
-        <span className="payment-cue swish-cue">🇸</span> {/* Swish Cue */} 
         Swish payment to: <span>{SWISH_NUMBER}</span>
       </p>
       <p><strong>Important:</strong> Enter your phone number 
         (<span>{phoneNumber}</span>) as the message. 
-        <span className="payment-cue phone-cue">📱</span> {/* Phone Cue */} 
       </p>
       <p className={showWaitingHighlight ? 'sms-wait-message' : ''}>
         You will receive the unlock code via SMS once payment is received. Please note that this may take up to a minute.
