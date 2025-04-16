@@ -65,37 +65,37 @@ function App() {
 
   // Handle product selection change
   const handleSelectionChange = useCallback((productId, isChecked) => {
-    setSelectedProductIds(prevSelectedIds => {
-      const newSelection = isChecked ? [...prevSelectedIds, productId] : prevSelectedIds.filter(id => id !== productId);
-      setSelectedProductIds(newSelection);
+    // Calculate the next selection state
+    const newSelection = isChecked 
+      ? [...selectedProductIds, productId] 
+      : selectedProductIds.filter(id => id !== productId);
 
-      // Update vibe based on last selected item
-      if (newSelection.length > prevSelectedIds.length) {
-        // Item added
-        const lastAddedId = newSelection[newSelection.length - 1];
-        const newVibe = PRODUCT_VIBES[lastAddedId] || 'default';
-        setCurrentVibe(newVibe);
-      } else if (newSelection.length < prevSelectedIds.length) {
-        // Item removed
-        if (newSelection.length === 0) {
-          setCurrentVibe('default'); // Reset to default if empty
-        } else {
-          // Set vibe based on the *new* last item in the selection
-          const lastItemId = newSelection[newSelection.length - 1];
-          const newVibe = PRODUCT_VIBES[lastItemId] || 'default';
-          setCurrentVibe(newVibe);
-        }
+    // Update vibe based on the change from current state to new state
+    if (newSelection.length > selectedProductIds.length) {
+      // Item added: Vibe based on the last item in the new list
+      const lastAddedId = newSelection[newSelection.length - 1];
+      const newVibe = PRODUCT_VIBES[lastAddedId] || 'default';
+      setCurrentVibe(newVibe);
+    } else if (newSelection.length < selectedProductIds.length) {
+      // Item removed
+      if (newSelection.length === 0) {
+        setCurrentVibe('default'); // Reset to default if empty
       } else {
-        // Selection changed but length is same (shouldn't happen with current logic)
-        setCurrentVibe('default');
+        // Vibe based on the *new* last item remaining in the list
+        const lastItemId = newSelection[newSelection.length - 1];
+        const newVibe = PRODUCT_VIBES[lastItemId] || 'default';
+        setCurrentVibe(newVibe);
       }
+    } 
+    // If length is the same, vibe doesn't need to change based on last item rule
 
-      setPhoneHasInput(false); // Reset phone input status on selection change
-      return newSelection;
-    });
-    // Hide payment info if product selection changes
+    // Update the selection state
+    setSelectedProductIds(newSelection);
+    
+    // Reset phone input status and hide payment info on any selection change
+    setPhoneHasInput(false);
     setShowPaymentInfo(false); 
-  }, []);
+  }, [selectedProductIds]); // Add selectedProductIds dependency
 
   // Handle phone number input change
   const handlePhoneChange = useCallback((value) => {
