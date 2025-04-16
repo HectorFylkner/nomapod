@@ -27,6 +27,40 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* Base Colors */
+  --secondary-color: #f0f0f0;
+  --background-light: #ffffff;
+  --background-dark: #2a2a2e;
+  --box-shadow-light: 0 2px 5px rgba(0, 0, 0, 0.1);
+
+  /* Default Background Animation Colors (Cola Vibe) */
+  --bg-color-1: #e63946;
+  --bg-color-2: #f1faee;
+  --bg-color-3: #a8dadc;
+  --bg-color-4: #457b9d;
+}
+
+/* Vibe-based Background Color Themes */
+:root.vibe-nocco {
+  --bg-color-1: #00f5d4;
+  --bg-color-2: #00bbf9;
+  --bg-color-3: #fee440;
+  --bg-color-4: #f15bb5;
+}
+
+:root.vibe-barebell {
+  --bg-color-1: #d4a373;
+  --bg-color-2: #faedcd;
+  --bg-color-3: #fefae0;
+  --bg-color-4: #e9edc9;
+}
+
+:root.vibe-gottblandat {
+  --bg-color-1: #ffcbf2;
+  --bg-color-2: #f3c4fb;
+  --bg-color-3: #ecbcfd;
+  --bg-color-4: #e5b3fe;
 }
 
 /* Keyframes for the background gradient animation */

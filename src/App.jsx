@@ -11,6 +11,14 @@ import './App.css';
 
 const NUM_SKELETONS = 4;
 
+// Map Product IDs to Vibe names (must match CSS classes)
+const PRODUCT_VIBES = {
+  prod1: 'default',      // Coca Cola Zero
+  prod2: 'nocco',        // Nocco
+  prod3: 'barebell',     // Barebell
+  prod4: 'gottblandat',  // Gott och Blandat
+};
+
 function App() {
   const [products, setProducts] = useState([]);
   const [selectedProductIds, setSelectedProductIds] = useState([]);
@@ -22,6 +30,7 @@ function App() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPulse, setShowPulse] = useState(false);
   const [highlightedProductId, setHighlightedProductId] = useState(null);
+  const [currentVibe, setCurrentVibe] = useState('default');
 
   const prevCanProceedRef = useRef();
 
@@ -57,11 +66,32 @@ function App() {
   // Handle product selection change
   const handleSelectionChange = useCallback((productId, isChecked) => {
     setSelectedProductIds(prevSelectedIds => {
-      if (isChecked) {
-        return [...prevSelectedIds, productId];
+      const newSelection = isChecked ? [...prevSelectedIds, productId] : prevSelectedIds.filter(id => id !== productId);
+      setSelectedProductIds(newSelection);
+
+      // Update vibe based on last selected item
+      if (newSelection.length > prevSelectedIds.length) {
+        // Item added
+        const lastAddedId = newSelection[newSelection.length - 1];
+        const newVibe = PRODUCT_VIBES[lastAddedId] || 'default';
+        setCurrentVibe(newVibe);
+      } else if (newSelection.length < prevSelectedIds.length) {
+        // Item removed
+        if (newSelection.length === 0) {
+          setCurrentVibe('default'); // Reset to default if empty
+        } else {
+          // Set vibe based on the *new* last item in the selection
+          const lastItemId = newSelection[newSelection.length - 1];
+          const newVibe = PRODUCT_VIBES[lastItemId] || 'default';
+          setCurrentVibe(newVibe);
+        }
       } else {
-        return prevSelectedIds.filter(id => id !== productId);
+        // Selection changed but length is same (shouldn't happen with current logic)
+        setCurrentVibe('default');
       }
+
+      setPhoneHasInput(false); // Reset phone input status on selection change
+      return newSelection;
     });
     // Hide payment info if product selection changes
     setShowPaymentInfo(false); 
@@ -137,6 +167,23 @@ function App() {
       }
       return reason;
   }, [canProceedToPayment, selectedProductIds, isPhoneValid, phoneHasInput]);
+
+  // ADD: Effect to apply vibe class to the root element
+  useEffect(() => {
+    const root = document.documentElement;
+    // Remove existing vibe classes
+    Object.values(PRODUCT_VIBES).forEach(vibe => {
+      root.classList.remove(`vibe-${vibe}`); // Remove specific vibe classes
+    });
+    root.classList.remove('vibe-default'); // Ensure default is removed too
+
+    // Add the current vibe class (handle 'default' case separately)
+    if (currentVibe !== 'default') {
+      root.classList.add(`vibe-${currentVibe}`);
+    } 
+    // No need to explicitly add 'vibe-default' as the :root defaults are the 'default' vibe
+
+  }, [currentVibe]);
 
   // Render Error state first if product fetch failed
   if (productError) {

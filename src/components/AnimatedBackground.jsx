@@ -18,7 +18,7 @@ function AnimatedBackground() {
         // Optional: callback when particles container is loaded
     }, []);
 
-    // Basic manual configuration instead of preset
+    // Basic manual configuration using CSS Variables
     const options = {
         background: {
             color: { 
@@ -28,14 +28,26 @@ function AnimatedBackground() {
         fpsLimit: 60, // Limit FPS for performance
         particles: {
             color: {
-                value: "#cccccc" // Simple grey particles
+                // Use a mix of the theme colors for particles
+                value: ["var(--bg-color-1)", "var(--bg-color-2)", "var(--bg-color-3)", "var(--bg-color-4)"]
             },
             links: {
-                color: "#cccccc",
+                color: "var(--bg-color-3)", // Use one theme color for links
                 distance: 150,
                 enable: true,
-                opacity: 0.3,
-                width: 1
+                opacity: 0.4, // Slightly increase opacity
+                width: 1,
+                // Add subtle link color variance on hover if desired (optional)
+                /*
+                warp: false,
+                triangles: {
+                    enable: false,
+                    frequency: 1,
+                    opacity: 0.8,
+                    width: 1,
+                    color: "var(--bg-color-4)", // Example color
+                },
+                */
             },
             move: {
                 direction: "none",
