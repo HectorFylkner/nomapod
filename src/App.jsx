@@ -11,14 +11,6 @@ import './App.css';
 
 const NUM_SKELETONS = 4;
 
-// Map Product IDs to Vibe names (must match CSS classes)
-const PRODUCT_VIBES = {
-  prod1: 'default',      // Coca Cola Zero
-  prod2: 'nocco',        // Nocco
-  prod3: 'barebell',     // Barebell
-  prod4: 'gottblandat',  // Gott och Blandat
-};
-
 function App() {
   const [products, setProducts] = useState([]);
   const [selectedProductIds, setSelectedProductIds] = useState([]);
@@ -30,7 +22,6 @@ function App() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPulse, setShowPulse] = useState(false);
   const [highlightedProductId, setHighlightedProductId] = useState(null);
-  const [currentVibe, setCurrentVibe] = useState('default');
 
   const prevCanProceedRef = useRef();
 
@@ -70,32 +61,13 @@ function App() {
       ? [...selectedProductIds, productId] 
       : selectedProductIds.filter(id => id !== productId);
 
-    // Update vibe based on the change from current state to new state
-    if (newSelection.length > selectedProductIds.length) {
-      // Item added: Vibe based on the last item in the new list
-      const lastAddedId = newSelection[newSelection.length - 1];
-      const newVibe = PRODUCT_VIBES[lastAddedId] || 'default';
-      setCurrentVibe(newVibe);
-    } else if (newSelection.length < selectedProductIds.length) {
-      // Item removed
-      if (newSelection.length === 0) {
-        setCurrentVibe('default'); // Reset to default if empty
-      } else {
-        // Vibe based on the *new* last item remaining in the list
-        const lastItemId = newSelection[newSelection.length - 1];
-        const newVibe = PRODUCT_VIBES[lastItemId] || 'default';
-        setCurrentVibe(newVibe);
-      }
-    } 
-    // If length is the same, vibe doesn't need to change based on last item rule
-
     // Update the selection state
     setSelectedProductIds(newSelection);
     
     // Reset phone input status and hide payment info on any selection change
     setPhoneHasInput(false);
     setShowPaymentInfo(false); 
-  }, [selectedProductIds]); // Add selectedProductIds dependency
+  }, [selectedProductIds]); // Keep selectedProductIds dependency
 
   // Handle phone number input change
   const handlePhoneChange = useCallback((value) => {
@@ -167,23 +139,6 @@ function App() {
       }
       return reason;
   }, [canProceedToPayment, selectedProductIds, isPhoneValid, phoneHasInput]);
-
-  // ADD: Effect to apply vibe class to the root element
-  useEffect(() => {
-    const root = document.documentElement;
-    // Remove existing vibe classes
-    Object.values(PRODUCT_VIBES).forEach(vibe => {
-      root.classList.remove(`vibe-${vibe}`); // Remove specific vibe classes
-    });
-    root.classList.remove('vibe-default'); // Ensure default is removed too
-
-    // Add the current vibe class (handle 'default' case separately)
-    if (currentVibe !== 'default') {
-      root.classList.add(`vibe-${currentVibe}`);
-    } 
-    // No need to explicitly add 'vibe-default' as the :root defaults are the 'default' vibe
-
-  }, [currentVibe]);
 
   // Render Error state first if product fetch failed
   if (productError) {
