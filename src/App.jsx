@@ -32,8 +32,8 @@ function App() {
   const [productError, setProductError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPulse, setShowPulse] = useState(false);
-  const [greeting, setGreeting] = useState(''); // State for greeting
-  const [smartHint, setSmartHint] = useState(''); // State for smart hint
+  const [greeting, setGreeting] = useState('');
+  const [smartHint, setSmartHint] = useState('');
 
   const prevCanProceedRef = useRef();
   const { width, height } = useWindowSize();
@@ -202,7 +202,7 @@ function App() {
 
         {!isLoadingProducts && (
           <div className="section-controls">
-            <TotalDisplay totalPrice={totalPrice} priceDifference={priceDifference} /> 
+            <TotalDisplay totalPrice={totalPrice} /> 
             {/* Render Smart Hint */} 
             {smartHint && <p className="smart-hint">{smartHint}</p>}
             <PhoneInput 
