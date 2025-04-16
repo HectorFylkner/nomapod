@@ -10,7 +10,6 @@ import AnimatedBackground from './components/AnimatedBackground';
 import './App.css';
 
 const NUM_SKELETONS = 4;
-const HIGHLIGHTED_PRODUCT_ID = 'prod3'; // Example: Highlight Barebells
 
 function App() {
   const [products, setProducts] = useState([]);
@@ -22,6 +21,7 @@ function App() {
   const [productError, setProductError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPulse, setShowPulse] = useState(false);
+  const [highlightedProductId, setHighlightedProductId] = useState(null);
 
   const prevCanProceedRef = useRef();
 
@@ -30,6 +30,7 @@ function App() {
     const fetchProducts = async () => {
       setIsLoadingProducts(true);
       setProductError(null);
+      setHighlightedProductId(null);
       try {
         const productsPath = `${import.meta.env.BASE_URL}products.json`;
         const response = await fetch(productsPath);
@@ -38,6 +39,10 @@ function App() {
         }
         const data = await response.json();
         setProducts(data);
+        if (data && data.length > 0) {
+          const randomIndex = Math.floor(Math.random() * data.length);
+          setHighlightedProductId(data[randomIndex].id);
+        }
       } catch (error) {
         console.error("Could not load products:", error);
         setProductError('Failed to load products. Please refresh or try again later.');
@@ -156,7 +161,7 @@ function App() {
                 products={products}
                 selectedProducts={selectedProductIds}
                 onSelectionChange={handleSelectionChange}
-                highlightedProductId={HIGHLIGHTED_PRODUCT_ID} // Pass down highlighted ID
+                highlightedProductId={highlightedProductId}
               />
             )}
           </div>
