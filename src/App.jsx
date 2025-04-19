@@ -110,10 +110,37 @@ function App() {
     if (!canProceedToPayment || isSubmitting) return;
 
     setIsSubmitting(true);
+
+    // 1. Build structured order data
+    const selectedItemsDetails = selectedProductIds.map(id => {
+      const product = products.find(p => p.id === id);
+      return { 
+        id: product.id,
+        name: product.name,
+        price: product.price
+      }; 
+    });
+
+    const orderData = {
+      items: selectedItemsDetails,
+      totalPrice: totalPrice,
+      phoneNumber: phoneNumber,
+      // Optional: Add a timestamp or simulated order ID
+      timestamp: new Date().toISOString(),
+      // orderId: crypto.randomUUID() // Requires HTTPS or secure context, use timestamp for now
+    };
+
+    // 2. Simulate API Call (Log to console)
+    console.log("Simulating API call to backend with order data:", orderData);
+
+    // 3. Simulate network delay
     setTimeout(() => {
-        setShowPaymentInfo(true);
-        setIsSubmitting(false);
-    }, 300);
+      // 4. Finish submitting and show payment info
+      setIsSubmitting(false);
+      setShowPaymentInfo(true);
+      // We'll pass the necessary props to PaymentInfo as before
+      // PaymentInfo component will be updated next to display item details
+    }, 500); // Simulate 500ms delay
   };
 
   // Handle cancelling/hiding payment info
