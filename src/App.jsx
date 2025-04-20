@@ -1,13 +1,18 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
 import Header from './components/Header';
 import ProductList from './components/ProductList';
 import ProductSkeleton from './components/ProductSkeleton';
 import TotalDisplay from './components/TotalDisplay';
 import PhoneInput from './components/PhoneInput';
-import PaymentInfo from './components/PaymentInfo';
 import Footer from './components/Footer';
+import CheckoutForm from './components/CheckoutForm';
 import AnimatedBackground from './components/AnimatedBackground';
 import './App.css';
+
+// Load Stripe outside of component render to avoid recreating promise on every render
+const stripePromise = loadStripe('pk_test_51RFlVxFN18Z8RV2NuliLX6cPtgCFq0eKVkZU4dY7W9ityPCSWWQk3RSLj3TvMW8FBsHRsHGbogPrK4BJ4wnqQv1b00EN7Bn7pZ');
 
 const NUM_SKELETONS = 4;
 
@@ -22,6 +27,7 @@ function App() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPulse, setShowPulse] = useState(false);
   const [highlightedProductId, setHighlightedProductId] = useState(null);
+  const [clientSecret, setClientSecret] = useState('');
 
   const prevCanProceedRef = useRef();
 
@@ -105,7 +111,7 @@ function App() {
     prevCanProceedRef.current = canProceedToPayment;
   }, [canProceedToPayment]);
 
-  // Handle showing payment info
+  // Modified handleShowPaymentInfo to set client secret (simulated)
   const handleShowPaymentInfo = () => {
     if (!canProceedToPayment || isSubmitting) return;
 
@@ -125,27 +131,34 @@ function App() {
       items: selectedItemsDetails,
       totalPrice: totalPrice,
       phoneNumber: phoneNumber,
-      // Optional: Add a timestamp or simulated order ID
       timestamp: new Date().toISOString(),
-      // orderId: crypto.randomUUID() // Requires HTTPS or secure context, use timestamp for now
     };
 
-    // 2. Simulate API Call (Log to console)
-    console.log("Simulating API call to backend with order data:", orderData);
-
-    // 3. Simulate network delay
+    // 2. Simulate API Call to create PaymentIntent (Log & set dummy client secret)
+    console.log("Simulating API call to backend to create PaymentIntent with order data:", orderData);
+    // IN A REAL APP: Replace this with fetch to your backend endpoint
+    // fetch('/api/create-payment-intent', { method: 'POST', body: JSON.stringify(orderData) })
+    //   .then(res => res.json())
+    //   .then(data => setClientSecret(data.clientSecret));
+    
+    // Simulate getting a client secret after a delay
     setTimeout(() => {
-      // 4. Finish submitting and show payment info
+      // ** Replace with actual client secret from your backend **
+      const simulatedClientSecret = "pi_test_secret_12345"; // Dummy value for front-end setup
+      setClientSecret(simulatedClientSecret);
+      console.log("Simulated: Received clientSecret:", simulatedClientSecret);
+
+      // 4. Finish submitting and show payment info container
       setIsSubmitting(false);
       setShowPaymentInfo(true);
-      // We'll pass the necessary props to PaymentInfo as before
-      // PaymentInfo component will be updated next to display item details
-    }, 500); // Simulate 500ms delay
+      // The actual Stripe form will be inside the PaymentInfo component area now
+    }, 800); // Slightly longer delay to simulate backend call
   };
 
   // Handle cancelling/hiding payment info
   const handleCancelPayment = useCallback(() => {
     setShowPaymentInfo(false);
+    setClientSecret(''); // Also clear client secret on cancel
   }, []);
 
   // Determine tooltip text for disabled payment button
@@ -166,6 +179,12 @@ function App() {
       }
       return reason;
   }, [canProceedToPayment, selectedProductIds, isPhoneValid, phoneHasInput]);
+
+  // Options for Stripe Elements provider
+  const options = {
+    clientSecret,
+    // appearance: { /* Customize appearance here if needed */ },
+  };
 
   // Render Error state first if product fetch failed
   if (productError) {
@@ -213,22 +232,24 @@ function App() {
                         disabled={!canProceedToPayment || isSubmitting}
                         title={paymentButtonTitle}
                     >
-                        <span>Show Payment Info</span>
+                        <span>Proceed to Payment</span> 
                     </button>
                 </div>
             </div>
           </div>
         )}
 
-        <div className={`payment-info-wrapper ${showPaymentInfo ? 'visible' : ''}`}> 
-          <PaymentInfo 
-            products={products}
-            selectedProductIds={selectedProductIds}
-            totalPrice={totalPrice}
-            phoneNumber={phoneNumber}
-            onCancel={handleCancelPayment}
-          />
-        </div>
+        {/* Conditionally render Elements Provider only when clientSecret is available */} 
+        {clientSecret && showPaymentInfo && (
+          <Elements stripe={stripePromise} options={options}>
+            <div className={`payment-info-wrapper ${showPaymentInfo ? 'visible' : ''}`}> 
+              <CheckoutForm totalPrice={totalPrice} />
+              <button onClick={handleCancelPayment} className="edit-selection-button" style={{marginTop: '15px'}}>
+                 Cancel Payment
+               </button> 
+            </div>
+          </Elements>
+        )}
 
       </div>
       <Footer />
