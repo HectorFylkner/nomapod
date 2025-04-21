@@ -28,11 +28,17 @@ app.get('/health', (req, res) => {
 // Webhook endpoint for Stripe events
 // Use express.raw for this specific route to get the raw body for signature verification
 app.post('/webhook', express.raw({type: 'application/json'}), (req, res) => {
+  console.log('Webhook endpoint hit'); // Log entry into webhook handler
   const sig = req.headers['stripe-signature'];
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  
+  // Explicitly log the value read from process.env
+  const rawWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  console.log('Attempting to read webhook secret. Value retrieved from process.env:', rawWebhookSecret);
+  
+  const webhookSecret = rawWebhookSecret; // Use the logged value
 
   if (!webhookSecret) {
-    console.error('Stripe webhook secret is not set.');
+    console.error('Stripe webhook secret is not set (checked after logging).'); // Refined error message
     return res.status(400).send('Webhook Error: Server configuration error.');
   }
 
