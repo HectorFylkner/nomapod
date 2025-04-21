@@ -1,7 +1,7 @@
 import Stripe from 'stripe';
 import { buffer } from 'micro';
 import { Vonage } from '@vonage/server-sdk';
-import { SMS } from '@vonage/messages';
+import util from 'util'; // Import the util module for improved logging
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2024-04-10',
@@ -70,19 +70,46 @@ export default async function handler(req, res) {
           const messageBody = `Your nomapod lock code is: ${lockCode}.`;
 
           try {
-            console.log(`Attempting to send SMS lock code via Vonage to ${formattedPhoneNumber} from ${vonageNumber}`);
-            
-            const message = new SMS(messageBody, formattedPhoneNumber, vonageNumber);
-            const results = await vonage.messages.send(message);
-            
-            if (results && results.message_uuid) {
-              console.log(`✅ SMS submitted successfully via Vonage! Message UUID: ${results.message_uuid}`);
+            console.log(`Attempting to send SMS lock code via Vonage (SMS API) to ${formattedPhoneNumber} from ${vonageNumber}`);
+
+            // --- Use the legacy SMS API ---
+            const vonageResponse = await vonage.sms.send({
+                to: formattedPhoneNumber,
+                from: vonageNumber, // Can be your Vonage number or an approved Alphanumeric Sender ID
+                text: messageBody
+            });
+            // --------------------------------
+
+            // Log the raw response for debugging
+            console.log('Raw Vonage SMS API Response:', JSON.stringify(vonageResponse, null, 2));
+
+            // Check response structure (this might vary slightly, adjust as needed based on logs)
+            // Example check: assuming response has a messages array and the first message has a status
+            if (vonageResponse && vonageResponse['message-count'] === '1' && vonageResponse.messages && vonageResponse.messages[0].status === '0') {
+              console.log(`✅ SMS submitted successfully via Vonage (SMS API)! Message ID: ${vonageResponse.messages[0]['message-id']}`);
             } else {
-              console.warn(`⚠️ Vonage SMS submission failed or gave unexpected response:`, results);
+              const status = vonageResponse?.messages?.[0]?.status;
+              const errorText = vonageResponse?.messages?.[0]?.['error-text'];
+              console.warn(`⚠️ Vonage SMS submission failed or requires attention. Status: ${status || 'N/A'}, Error: ${errorText || 'N/A'}`);
             }
-            
+
           } catch (smsError) {
-            console.error(`🆘 Failed to send SMS via Vonage to ${formattedPhoneNumber}:`, smsError);
+            // --- Improved Error Logging ---
+            console.error(`🆘 Failed to send SMS via Vonage (SMS API) to ${formattedPhoneNumber}`);
+            console.error('Raw Vonage Error Object:', util.inspect(smsError, {depth: 5})); // Log the full error object structure
+
+            // Log specific HTTP details if available (often helpful for auth/network issues)
+            if (smsError.response) {
+                console.error('--> HTTP Status:', smsError.response.status);
+                try {
+                    // Attempt to parse and log the response body text
+                    const errorBody = await smsError.response.text();
+                    console.error('--> HTTP Response Body:', errorBody);
+                } catch (bodyError) {
+                    console.error('--> Error reading HTTP Response Body:', bodyError);
+                }
+            }
+            // --- End Improved Error Logging ---
           }
         } else {
           if (!customerPhoneNumber) console.warn("⚠️ Cannot send SMS: Customer phone number missing.");
