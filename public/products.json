@@ -4,27 +4,31 @@
         "name": "Coca Cola Zero",
         "price": 20,
         "imgSrc": "Coca-Cola_Zero.jpg.webp",
-        "altText": "Coca Cola Zero can"
+        "altText": "Coca Cola Zero can",
+        "isActive": true
     },
     {
         "id": "prod2",
         "name": "Nocco",
         "price": 20,
         "imgSrc": "PB-3542_1.jpg.webp",
-        "altText": "Nocco energy drink can"
+        "altText": "Nocco energy drink can",
+        "isActive": true
     },
     {
         "id": "prod3",
         "name": "Barebell Protein Bar",
         "price": 25,
         "imgSrc": "Barebell.jpg.webp",
-        "altText": "Barebell protein bar"
+        "altText": "Barebell protein bar",
+        "isActive": true
     },
     {
         "id": "prod4",
         "name": "Gott och Blandat",
         "price": 20,
         "imgSrc": "GottoBlandat.jpg.webp",
-        "altText": "Bag of Gott och Blandat candy"
+        "altText": "Bag of Gott och Blandat candy",
+        "isActive": true
     }
 ] 
