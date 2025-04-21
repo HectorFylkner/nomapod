@@ -9,13 +9,14 @@ The page allows users to:
 2.  Select one or more products.
 3.  See the total price update in real-time.
 4.  Enter their phone number (Swedish format validation).
-5.  View manual payment instructions for Swish, including the total amount and required Swish message content.
+5.  Proceed to a secure payment form powered by Stripe Elements.
+6.  Pay using various methods supported by Stripe (including cards and potentially digital wallets like Apple Pay/Google Pay).
 
-**Important:** This frontend application **simulates** the user flow. It **does not** handle actual payment processing, Swish integration, payment verification, or sending SMS unlock codes. These processes are assumed to be handled manually or by a separate backend system for the MVP stage.
+**Note:** This application integrates with Stripe for payment processing. It uses Vercel Serverless Functions for backend operations like creating Payment Intents and handling Stripe webhooks.
 
 ## Purpose
 
-The primary goal is to provide a functional and maintainable user interface for the purchase flow, guiding the user through product selection and providing the necessary information to complete a manual Swish payment. This version uses React and Vite for improved structure, maintainability, and developer experience compared to the original static HTML version.
+The primary goal is to provide a functional and user-friendly interface for selecting products and completing payments securely via Stripe. This version uses React and Vite for improved structure, maintainability, and developer experience.
 
 ## Features
 
@@ -23,17 +24,12 @@ The primary goal is to provide a functional and maintainable user interface for 
 *   Fast development server and optimized build process powered by Vite.
 *   Dynamic product list loaded from `/public/products.json`.
 *   Checkbox-based multiple product selection.
-*   Real-time calculation and display of the total price with visual feedback on change.
+*   Real-time calculation and display of the total price.
 *   Required phone number input with client-side validation (10 digits, Swedish format).
-*   Visual feedback for invalid phone number input.
-*   "Show Payment Info" button enabled only when products are selected and a valid phone number is entered.
-*   Tooltip on disabled payment button explaining requirements.
-*   Reveals a payment instruction section with:
-    *   A summary of the selected items.
-    *   The total amount to pay.
-    *   The designated Swish number (configured in `src/components/PaymentInfo.jsx` or ideally a central config).
-    *   Instructions for the user (include phone number in message, wait for SMS code).
-    *   Reminder to close the box and reset the lock after purchase.
+*   Secure payment processing integrated using Stripe Elements (`CheckoutForm`).
+*   Backend API routes (`/api`) built as Vercel Serverless Functions:
+    *   `/api/create-payment-intent`: Creates a Stripe PaymentIntent.
+    *   `/api/webhook`: Handles incoming events from Stripe (e.g., payment success/failure).
 *   Minimalist, responsive design optimized for mobile devices.
 
 ## Technology Stack
@@ -41,8 +37,10 @@ The primary goal is to provide a functional and maintainable user interface for 
 *   **React:** JavaScript library for building user interfaces.
 *   **Vite:** Fast frontend build tool and development server.
 *   **JavaScript (ES6+):** Core language for application logic.
-*   **CSS3:** Styling with CSS Variables, organized via CSS Modules or global stylesheets (`src/App.css`, `src/index.css`).
+*   **CSS3:** Styling (`src/App.css`, `src/index.css`).
 *   **HTML5:** Structure provided by `index.html` and JSX within React components.
+*   **Stripe Elements:** Secure UI components for collecting payment details.
+*   **Vercel:** Hosting platform for frontend and serverless backend functions.
 
 ## Project Structure
 
@@ -50,15 +48,20 @@ The primary goal is to provide a functional and maintainable user interface for 
     *   `products.json`: Default product data.
     *   `nomapod.png`: Logo.
     *   `*.webp`: Product images.
+    *   *(Potentially `.well-known/` for Apple Pay verification)*
 *   **`src/`**: Contains the React application source code.
     *   `main.jsx`: Application entry point.
     *   `App.jsx`: Main application component managing state and layout.
     *   `App.css`, `index.css`: CSS files.
-    *   **`components/`**: Directory containing reusable React components (e.g., `ProductList`, `PhoneInput`).
+    *   **`components/`**: Directory containing reusable React components (e.g., `ProductList`, `PhoneInput`, `CheckoutForm`).
+*   **`api/`**: Contains Vercel Serverless Functions for backend logic.
+    *   `create-payment-intent.js`: Handles Stripe PaymentIntent creation.
+    *   `webhook.js`: Handles incoming Stripe webhooks.
 *   **`index.html`**: The main HTML template Vite uses.
 *   **`package.json`**: Project metadata and dependencies.
 *   **`vite.config.js`**: Vite configuration file.
 *   **`.gitignore`**: Specifies intentionally untracked files for Git.
+*   **`.env.local`**: Local environment variables (ignored by Git). Should contain `VITE_STRIPE_PUBLISHABLE_KEY` for local development.
 
 ## Local Development
 
@@ -69,11 +72,16 @@ The primary goal is to provide a functional and maintainable user interface for 
     ```bash
     npm install
     ```
-5.  **Run Development Server:**
+5.  **Environment Variables (Local):** Create a `.env.local` file in the project root and add your **Test** Stripe Publishable Key:
+    ```dotenv
+    VITE_STRIPE_PUBLISHABLE_KEY=pk_test_xxxxxxxxxxxxxx
+    ```
+    *(Note: For local development hitting the deployed Vercel API routes, you don't strictly need the secret keys locally, as the backend functions run on Vercel. If running a local backend server, you'd need the secrets too.)*
+6.  **Run Development Server:**
     ```bash
     npm run dev
     ```
-    This will start the Vite dev server (typically at `http://localhost:5173`). The application will automatically reload when you save changes.
+    This will start the Vite dev server (typically at `http://localhost:5173`).
 
 ## Building for Production
 
@@ -82,34 +90,30 @@ To create an optimized build for deployment:
 ```bash
 npm run build
 ```
-This command generates a `dist` directory containing the static HTML, CSS, and JavaScript files ready for deployment.
+This command generates a `dist` directory containing the static frontend assets. Vercel typically runs this command automatically during deployment.
 
-## Environment Variables
+## Environment Variables (Vercel)
 
-Before deploying the API routes, you must set the following in your hosting environment (e.g. Vercel):
+Before deploying or redeploying on Vercel, ensure the following environment variables are set in your Vercel project **Settings → Environment Variables**, configured for the **Production** environment (and Preview/Development as needed):
 
-- `STRIPE_SECRET_KEY` — Your Stripe secret key (sk_test_... or sk_live_...)
-- `STRIPE_WEBHOOK_SECRET` — The webhook signing secret (whsec_...)
-
-Ensure each variable is configured for **Production** (and Preview/Development as needed) so that the API routes can read them via `process.env`.
+*   **`VITE_STRIPE_PUBLISHABLE_KEY`**: Your **Live** Stripe Publishable Key (`pk_live_...`). This is used by the frontend (Vite build).
+*   **`STRIPE_SECRET_KEY`**: Your **Live** Stripe Secret Key (`sk_live_...`). Used by the `/api` routes.
+*   **`STRIPE_WEBHOOK_SECRET`**: Your **Live** Stripe Webhook Signing Secret (`whsec_...`). Used by the `/api/webhook` route.
 
 ## Deployment
 
-This project now uses Vercel's file-system `api/` directory for backend routes. No custom server configuration is needed.
+This project is configured for deployment on Vercel, utilizing its seamless integration with Git and its handling of Serverless Functions in the `/api` directory.
 
-1.  **Commit & Push** your code, including the `api/` folder.
-2.  Go to your Vercel Dashboard and ensure the environment variables listed above are set under **Settings → Environment Variables**.
-3.  **Deploy:** Vercel will automatically detect and deploy both the frontend and backend API routes when you push to `main`.
+1.  **Connect Repository:** Ensure your GitHub repository is connected to a Vercel project.
+2.  **Configure Environment Variables:** Set the required Stripe keys (Publishable, Secret, Webhook Secret) in Vercel as described above.
+3.  **Push to Main Branch:** Committing and pushing changes to the `main` branch (or your configured production branch) will automatically trigger a new build and deployment on Vercel.
+4.  **Custom Domain:** Configure your custom domain (e.g., `nomapod.se`) in the Vercel project settings under **Settings → Domains**.
 
-Now your site will be available at `https://<your-project>.vercel.app`, and the endpoints:
-- `POST /api/create-payment-intent`
-- `POST /api/webhook`
-
-will function correctly. Let me know once you've set the env vars in Vercel and deployed, and we can test the webhook flow again!
+Your live site will be available at your custom domain, and the API endpoints (`/api/create-payment-intent`, `/api/webhook`) will function using the configured environment variables.
 
 ## Customization
 
-*   **Products:** Modify the `/public/products.json` file to change product details, prices, or images.
-*   **Swish Number:** Update the `SWISH_NUMBER` constant, currently located within `src/components/PaymentInfo.jsx`. Consider moving this to a dedicated configuration file (e.g., `src/config.js`) for better organization.
+*   **Products:** Modify the `/public/products.json` file.
 *   **Styling:** Modify CSS variables in `src/index.css` or component-specific styles in `src/App.css`.
-*   **Logo:** Replace the `/public/nomapod.png` file. 
+*   **Logo:** Replace the `/public/nomapod.png` file.
+*   **Stripe Integration:** Adjust logic in `src/components/CheckoutForm.jsx`, `/api/create-payment-intent.js`, and `/api/webhook.js` as needed. 
