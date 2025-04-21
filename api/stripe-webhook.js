@@ -33,6 +33,10 @@ export default function handler(req, res) {
 
   let event;
   try {
+    // IMPORTANT: Add buffer logic here eventually based on O3's suggestion
+    // const rawBody = await buffer(req);
+    // event = stripe.webhooks.constructEvent(rawBody, sig, secret);
+    // For now, using the potentially incorrect req.body to test routing first
     event = stripe.webhooks.constructEvent(req.body, sig, secret);
   } catch (err) {
     console.error(`Webhook signature verification failed: ${err.message}`);
