@@ -111,48 +111,59 @@ function App() {
     prevCanProceedRef.current = canProceedToPayment;
   }, [canProceedToPayment]);
 
-  // Modified handleShowPaymentInfo to set client secret (simulated)
-  const handleShowPaymentInfo = () => {
+  // Modified handleShowPaymentInfo to call the real backend
+  const handleShowPaymentInfo = async () => { // Make async for await
     if (!canProceedToPayment || isSubmitting) return;
 
     setIsSubmitting(true);
+    setClientSecret(''); // Clear previous secret
+    // Clear any previous error message if you have one
 
-    // 1. Build structured order data
-    const selectedItemsDetails = selectedProductIds.map(id => {
-      const product = products.find(p => p.id === id);
-      return { 
-        id: product.id,
-        name: product.name,
-        price: product.price
-      }; 
-    });
-
-    const orderData = {
-      items: selectedItemsDetails,
-      totalPrice: totalPrice,
-      phoneNumber: phoneNumber,
-      timestamp: new Date().toISOString(),
+    // Prepare data for the backend
+    const backendPayload = {
+      amount: totalPrice, // Backend expects 'amount'
+      phoneNumber: phoneNumber
     };
 
-    // 2. Simulate API Call to create PaymentIntent (Log & set dummy client secret)
-    console.log("Simulating API call to backend to create PaymentIntent with order data:", orderData);
-    // IN A REAL APP: Replace this with fetch to your backend endpoint
-    // fetch('/api/create-payment-intent', { method: 'POST', body: JSON.stringify(orderData) })
-    //   .then(res => res.json())
-    //   .then(data => setClientSecret(data.clientSecret));
-    
-    // Simulate getting a client secret after a delay
-    setTimeout(() => {
-      // ** Replace with actual client secret from your backend **
-      const simulatedClientSecret = "pi_test_secret_12345"; // Dummy value for front-end setup
-      setClientSecret(simulatedClientSecret);
-      console.log("Simulated: Received clientSecret:", simulatedClientSecret);
+    try {
+      // Get the API URL from environment variables
+      const apiUrl = import.meta.env.VITE_API_URL;
+      if (!apiUrl) {
+        throw new Error("API URL is not configured.");
+      }
 
-      // 4. Finish submitting and show payment info container
-      setIsSubmitting(false);
-      setShowPaymentInfo(true);
-      // The actual Stripe form will be inside the PaymentInfo component area now
-    }, 800); // Slightly longer delay to simulate backend call
+      console.log("Calling backend to create PaymentIntent:", `${apiUrl}/create-payment-intent`);
+      const response = await fetch(`${apiUrl}/create-payment-intent`, { 
+        method: 'POST', 
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(backendPayload) 
+      });
+
+      if (!response.ok) {
+        // Try to get error message from backend response body
+        const errorData = await response.json().catch(() => ({})); // Handle non-JSON errors
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (!data.clientSecret) {
+        throw new Error("Received invalid data from server (missing clientSecret).");
+      }
+
+      console.log("Received clientSecret:", data.clientSecret);
+      setClientSecret(data.clientSecret);
+      setShowPaymentInfo(true); // Show payment form only on success
+
+    } catch (error) {
+      console.error("Failed to create PaymentIntent:", error);
+      // TODO: Show an error message to the user
+      // e.g., set an error state: setErrorState(error.message || "Could not initialize payment.");
+    } finally {
+      setIsSubmitting(false); // Stop loading indicator regardless of outcome
+    }
   };
 
   // Handle cancelling/hiding payment info

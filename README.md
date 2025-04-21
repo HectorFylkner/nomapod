@@ -84,30 +84,28 @@ npm run build
 ```
 This command generates a `dist` directory containing the static HTML, CSS, and JavaScript files ready for deployment.
 
+## Environment Variables
+
+Before deploying the API routes, you must set the following in your hosting environment (e.g. Vercel):
+
+- `STRIPE_SECRET_KEY` — Your Stripe secret key (sk_test_... or sk_live_...)
+- `STRIPE_WEBHOOK_SECRET` — The webhook signing secret (whsec_...)
+
+Ensure each variable is configured for **Production** (and Preview/Development as needed) so that the API routes can read them via `process.env`.
+
 ## Deployment
 
-This React/Vite application requires a **build step** before deployment.
+This project now uses Vercel's file-system `api/` directory for backend routes. No custom server configuration is needed.
 
-**GitHub Pages Deployment (Recommended):**
+1.  **Commit & Push** your code, including the `api/` folder.
+2.  Go to your Vercel Dashboard and ensure the environment variables listed above are set under **Settings → Environment Variables**.
+3.  **Deploy:** Vercel will automatically detect and deploy both the frontend and backend API routes when you push to `main`.
 
-1.  **Configure GitHub Pages:** In your repository settings under "Pages", ensure the source is set to "GitHub Actions".
-2.  **Add GitHub Actions Workflow:** Create a file named `.github/workflows/deploy.yml` with the appropriate workflow steps to build and deploy your Vite application. This typically involves:
-    *   Checking out the code.
-    *   Setting up Node.js.
-    *   Running `npm install`.
-    *   Running `npm run build`.
-    *   Using an action (like `peaceiris/actions-gh-pages`) to deploy the contents of the `dist` directory to the `gh-pages` branch or directly to GitHub Pages.
+Now your site will be available at `https://<your-project>.vercel.app`, and the endpoints:
+- `POST /api/create-payment-intent`
+- `POST /api/webhook`
 
-    *(Refer to the [Vite documentation for deploying to GitHub Pages](https://vitejs.dev/guide/static-deploy.html#github-pages) for specific workflow examples.)*
-
-**Other Static Hosting Platforms (Netlify, Vercel, Cloudflare Pages, etc.):**
-
-1.  Connect your GitHub repository to the hosting provider.
-2.  Configure the build settings:
-    *   **Build Command:** `npm run build`
-    *   **Publish Directory:** `dist`
-
-These platforms will typically automatically detect Vite, install dependencies, run the build command, and deploy the resulting `dist` directory.
+will function correctly. Let me know once you've set the env vars in Vercel and deployed, and we can test the webhook flow again!
 
 ## Customization
 

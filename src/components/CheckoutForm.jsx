@@ -41,22 +41,18 @@ function CheckoutForm({ totalPrice }) { // Accept totalPrice to display on butto
         const { error } = await stripe.confirmPayment({
             elements,
             confirmParams: {
-                // Make sure to change this to your payment completion page
-                // return_url: `${window.location.origin}/payment-success`, // Example return URL
-                // For now, we won't redirect, just simulate.
+                // No return_url needed if using redirect: 'if_required'
+                // return_url: `${window.location.origin}/payment-success`, 
             },
-            // We are commenting out redirect to prevent actual redirect during simulation
-            // redirect: "if_required"
+            // Add redirect: 'if_required' to handle result without redirecting
+            redirect: "if_required"
         });
         // ---------------------------------------------------------------
 
-        // Simulate success/error without actual redirect
+        // This part will handle the result if no redirect occurs
         if (error) { 
-            // This point will only be reached if there is an immediate error when
-            // confirming the payment. Otherwise, your customer will be redirected to
-            // your `return_url`. For some payment methods like iDEAL, your customer will
-            // be redirected to an intermediate site first to authorize the payment, then
-            // redirected to the `return_url`.
+            // This point will be reached if there is an immediate error or if
+            // redirect: 'if_required' is used and the payment fails.
             if (error.type === "card_error" || error.type === "validation_error") {
                 setMessage(error.message);
             } else {
@@ -64,11 +60,11 @@ function CheckoutForm({ totalPrice }) { // Accept totalPrice to display on butto
             }
             console.error("Stripe Error:", error);
         } else {
-            // ** SIMULATION **: In a real scenario, the user would be redirected.
-            // Since we commented out redirect, we simulate success here.
-            console.log("Simulated Payment Success!");
-            setMessage(`Payment successful! (Simulated)`);
-            // Here you would typically show a success message or redirect manually
+            // This point will be reached if redirect: 'if_required' is used and 
+            // the payment succeeds without needing a redirect step.
+            // NOTE: The webhook is still the definitive source of truth!
+            console.log("Payment confirmation successful (client-side)!");
+            setMessage(`Payment successful! (Awaiting server confirmation)`); 
             // Potentially call a function passed via props to indicate success to App.jsx
         }
 
