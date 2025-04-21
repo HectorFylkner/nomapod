@@ -4,13 +4,16 @@ import {
     useStripe, 
     useElements 
 } from '@stripe/react-stripe-js';
+import './CheckoutForm.css'; // Import a CSS file for styling
 
 function CheckoutForm({ totalPrice }) { // Accept totalPrice to display on button
     const stripe = useStripe();
     const elements = useElements();
 
+    // State for user messages
     const [message, setMessage] = useState(null);
-    const [isLoading, setIsLoading] = useState(false);
+    // State to track overall process
+    const [paymentStatus, setPaymentStatus] = useState('idle'); // idle, processing, succeeded, error
 
     useEffect(() => {
         if (!stripe) {
@@ -33,12 +36,12 @@ function CheckoutForm({ totalPrice }) { // Accept totalPrice to display on butto
             return;
         }
 
-        setIsLoading(true);
+        setPaymentStatus('processing');
         setMessage("Processing payment...");
 
         // --- THIS IS WHERE THE ACTUAL PAYMENT CONFIRMATION HAPPENS ---
         // In a real app, this redirects the user to Stripe's payment page or shows an error
-        const { error } = await stripe.confirmPayment({
+        const { error, paymentIntent } = await stripe.confirmPayment({
             elements,
             confirmParams: {
                 // No return_url needed if using redirect: 'if_required'
@@ -56,24 +59,48 @@ function CheckoutForm({ totalPrice }) { // Accept totalPrice to display on butto
             if (error.type === "card_error" || error.type === "validation_error") {
                 setMessage(error.message);
             } else {
-                setMessage("An unexpected error occurred.");
+                setMessage("An unexpected payment error occurred.");
             }
             console.error("Stripe Error:", error);
-        } else {
+            setPaymentStatus('error');
+        } else if (paymentIntent && paymentIntent.status === 'succeeded') {
             // This point will be reached if redirect: 'if_required' is used and 
             // the payment succeeds without needing a redirect step.
             // NOTE: The webhook is still the definitive source of truth!
             console.log("Payment confirmation successful (client-side)!");
-            setMessage(`Payment successful! (Awaiting server confirmation)`); 
-            // Potentially call a function passed via props to indicate success to App.jsx
+            setMessage(null); // Clear processing message
+            setPaymentStatus('succeeded'); 
+        } else {
+            // Handle other potential statuses if needed
+            setMessage("Payment status uncertain. Please check your account or contact support.");
+            console.warn("Unexpected paymentIntent status:", paymentIntent?.status);
+            setPaymentStatus('error');
         }
-
-        setIsLoading(false);
     };
 
+    // --- Render different views based on status --- 
+
+    if (paymentStatus === 'succeeded') {
+        return (
+            <div className="payment-success">
+                <svg className="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                    <circle className="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+                    <path className="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                </svg>
+                <h3>Payment Successful!</h3>
+                <p>Thank you for your purchase.</p>
+                <p><strong>Please check your phone for the SMS unlock code (729).</strong></p>
+                {/* Optional: Add a button to close/reset */}
+                {/* <button onClick={() => window.location.reload()}>Done</button> */}
+            </div>
+        );
+    }
+
+    // Render payment form for idle, processing, error states
     const paymentElementOptions = {
         layout: "tabs"
     }
+    const isLoading = paymentStatus === 'processing';
 
     return (
         <form id="payment-form" onSubmit={handleSubmit}>
@@ -83,8 +110,8 @@ function CheckoutForm({ totalPrice }) { // Accept totalPrice to display on butto
                     {isLoading ? <div className="spinner" id="spinner"></div> : `Pay ${totalPrice} SEK`}
                 </span>
             </button>
-            {/* Show any error or success messages */} 
-            {message && <div id="payment-message">{message}</div>}
+            {/* Show any error or status messages */} 
+            {message && <div id="payment-message" className={paymentStatus === 'error' ? 'error' : ''}>{message}</div>}
         </form>
     );
 }
