@@ -75,11 +75,22 @@ function App() {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status} ${response.statusText}`);
         }
-        const data = await response.json();
-        setProducts(data);
-        if (data && data.length > 0) {
-          const randomIndex = Math.floor(Math.random() * data.length);
-          setHighlightedProductId(data[randomIndex].id);
+        const allProductsData = await response.json(); // Fetch all products
+        
+        // --- Filter for active products ---
+        // Assumes each product object in products.json has an "isActive": true/false field
+        const activeProducts = allProductsData.filter(product => product.isActive === true);
+        setProducts(activeProducts); // Set state only with active ones
+        // --- End Filter ---
+        
+        // Select a random active product to highlight
+        if (activeProducts && activeProducts.length > 0) {
+          const randomIndex = Math.floor(Math.random() * activeProducts.length);
+          setHighlightedProductId(activeProducts[randomIndex].id);
+        } else {
+          // Handle case where no active products are found
+          console.warn("No active products found in products.json");
+          setHighlightedProductId(null); // Ensure highlight is cleared
         }
       } catch (error) {
         console.error("Could not load products:", error);
@@ -90,7 +101,7 @@ function App() {
     };
 
     fetchProducts();
-  }, []);
+  }, []); // Keep dependency array empty to run only on mount
 
   // Handle product selection change
   const handleSelectionChange = useCallback((productId, isChecked) => {
