@@ -55,14 +55,14 @@ app.post('/webhook', express.raw({type: 'application/json'}), (req, res) => {
       // TODO: Get the "Lock to the box" code (how?)
       const lockCode = "TEMP_LOCK_CODE_123"; // Placeholder
 
-      // TODO: Get customer email (check logs above to see where it is)
-      const customerEmail = paymentIntentSucceeded.receipt_email || paymentIntentSucceeded.charges?.data?.[0]?.billing_details?.email;
+      // Get customer phone number from metadata
+      const customerPhoneNumber = paymentIntentSucceeded.metadata.phoneNumber;
 
-      if (customerEmail && lockCode) {
-        console.log(`TODO: Send lock code ${lockCode} to ${customerEmail}`);
-        // TODO: Implement actual email sending logic here
+      if (customerPhoneNumber && lockCode) {
+        console.log(`TODO: Send lock code ${lockCode} via SMS to ${customerPhoneNumber}`);
+        // TODO: Implement actual SMS sending logic here (e.g., using Twilio)
       } else {
-        console.error('Could not send lock code. Missing customer email or lock code.', { email: customerEmail, code: lockCode });
+        console.error('Could not send lock code. Missing customer phone number from metadata or lock code.', { phone: customerPhoneNumber, code: lockCode });
       }
 
       // TODO: Fulfill the purchase based on paymentIntentSucceeded (e.g., update database)
@@ -83,19 +83,29 @@ app.post('/webhook', express.raw({type: 'application/json'}), (req, res) => {
 
 // Create a payment intent
 app.post('/create-payment-intent', async (req, res) => {
-  const { amount } = req.body;
+  const { amount, phoneNumber } = req.body;
 
-  // Input validation
+  // Input validation for amount
   if (typeof amount !== 'number' || amount <= 0 || !Number.isInteger(amount * 100)) {
     console.error('Invalid amount received:', amount);
     return res.status(400).json({ error: 'Invalid amount provided. Amount must be a positive number.' });
   }
 
+  // Basic validation for phoneNumber (presence and maybe format)
+  if (!phoneNumber || typeof phoneNumber !== 'string' || phoneNumber.length < 5) { // Basic check
+    console.error('Invalid phone number received:', phoneNumber);
+    return res.status(400).json({ error: 'Invalid phone number provided.' });
+  }
+
   try {
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount * 100), // Ensure it's an integer in cents/öre
+      amount: Math.round(amount * 100),
       currency: 'sek',
-      payment_method_types: ['card'], // Specify allowed payment methods
+      payment_method_types: ['card'],
+      metadata: {
+        // Store the phone number here!
+        phoneNumber: phoneNumber
+      }
     });
 
     res.json({
