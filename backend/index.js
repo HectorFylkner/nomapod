@@ -6,7 +6,33 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const app = express();
 const port = process.env.PORT || 5000;
 
-app.use(cors());
+// Explicit CORS configuration
+const allowedOrigins = [
+  'http://localhost:5173', // Default Vite port
+  'http://localhost:3000'  // Common React port
+  // Add your production frontend URL here eventually if needed
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests) or from allowed origins
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: 'GET,POST,OPTIONS', // Explicitly allow methods
+  allowedHeaders: 'Content-Type,Authorization', // Allow necessary headers
+  credentials: true // If you were sending cookies/auth headers
+};
+
+// Use CORS middleware *before* other routes
+app.use(cors(corsOptions));
+// Enable preflight requests for all routes
+app.options('*', cors(corsOptions)); 
+
+// Middleware for parsing JSON bodies (needs to come after CORS options handling)
 app.use(express.json());
 
 // Health check endpoint
