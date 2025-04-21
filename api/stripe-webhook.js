@@ -2,10 +2,52 @@ import Stripe from 'stripe';
 import { buffer } from 'micro';
 import { Vonage } from '@vonage/server-sdk';
 import util from 'util'; // Import the util module for improved logging
+import { setTimeout } from 'node:timers/promises'; // Import for manual timeout
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2024-04-10',
 });
+
+// --- o3's Recommended Vonage Call Wrapper --- 
+async function sendLockSMS({ vonage, to, from, text }) {
+  const label = `[Vonage SMS → ${to}]`;
+
+  try {
+    // Short manual timeout so the function never hits Vercel's 10 s hard limit
+    const vonagePromise = vonage.sms.send({ to, from, text });
+    const response = await Promise.race([
+      vonagePromise,
+      setTimeout(7000, { timeout: true })
+    ]);
+
+    if (response?.timeout) throw new Error('Vonage SMS call timed out (>7 s)');
+
+    console.log(`${label} raw response: ${JSON.stringify(response)}`);
+
+    const msg = response.messages?.[0];
+    if (msg?.status === '0') {
+      console.log(`${label} ✅ delivered — message-id=${msg['message-id']}`);
+    } else {
+      throw new Error(
+        `API responded with non-zero status=${msg?.status || 'unknown'} ` +
+        `error="${msg?.['error-text'] || 'none'}"`
+      );
+    }
+  } catch (err) {
+    // Log *everything* – works for plain Error, UndiciError, AxiosError, etc.
+    console.error(`${label} 🆘 ${err.message || err}`);
+    console.error('⋯ full error object:', util.inspect(err, { depth: 5 }));
+
+    if (err.response) {
+      console.error('⋯ HTTP status:', err.response.status);
+      const body = await err.response.text().catch(() => '');
+      console.error('⋯ HTTP body:', body);
+    }
+    // Optionally rethrow if you want Vercel to show FUNCTION_INVOCATION_FAILED
+    // throw err; 
+  }
+}
+// --- End Vonage Call Wrapper ---
 
 export const config = {
   api: {
@@ -69,48 +111,13 @@ export default async function handler(req, res) {
           
           const messageBody = `Your nomapod lock code is: ${lockCode}.`;
 
-          try {
-            console.log(`Attempting to send SMS lock code via Vonage (SMS API) to ${formattedPhoneNumber} from ${vonageNumber}`);
+          await sendLockSMS({
+              vonage,
+              to: formattedPhoneNumber,
+              from: vonageNumber,
+              text: messageBody
+          });
 
-            // --- Use the legacy SMS API ---
-            const vonageResponse = await vonage.sms.send({
-                to: formattedPhoneNumber,
-                from: vonageNumber, // Can be your Vonage number or an approved Alphanumeric Sender ID
-                text: messageBody
-            });
-            // --------------------------------
-
-            // Log the raw response for debugging
-            console.log('Raw Vonage SMS API Response:', JSON.stringify(vonageResponse, null, 2));
-
-            // Check response structure (this might vary slightly, adjust as needed based on logs)
-            // Example check: assuming response has a messages array and the first message has a status
-            if (vonageResponse && vonageResponse['message-count'] === '1' && vonageResponse.messages && vonageResponse.messages[0].status === '0') {
-              console.log(`✅ SMS submitted successfully via Vonage (SMS API)! Message ID: ${vonageResponse.messages[0]['message-id']}`);
-            } else {
-              const status = vonageResponse?.messages?.[0]?.status;
-              const errorText = vonageResponse?.messages?.[0]?.['error-text'];
-              console.warn(`⚠️ Vonage SMS submission failed or requires attention. Status: ${status || 'N/A'}, Error: ${errorText || 'N/A'}`);
-            }
-
-          } catch (smsError) {
-            // --- Improved Error Logging ---
-            console.error(`🆘 Failed to send SMS via Vonage (SMS API) to ${formattedPhoneNumber}`);
-            console.error('Raw Vonage Error Object:', util.inspect(smsError, {depth: 5})); // Log the full error object structure
-
-            // Log specific HTTP details if available (often helpful for auth/network issues)
-            if (smsError.response) {
-                console.error('--> HTTP Status:', smsError.response.status);
-                try {
-                    // Attempt to parse and log the response body text
-                    const errorBody = await smsError.response.text();
-                    console.error('--> HTTP Response Body:', errorBody);
-                } catch (bodyError) {
-                    console.error('--> Error reading HTTP Response Body:', bodyError);
-                }
-            }
-            // --- End Improved Error Logging ---
-          }
         } else {
           if (!customerPhoneNumber) console.warn("⚠️ Cannot send SMS: Customer phone number missing.");
           if (!vonage) console.warn("⚠️ Cannot send SMS: Vonage client not initialized (check VONAGE_API_KEY/VONAGE_API_SECRET).");
@@ -125,7 +132,7 @@ export default async function handler(req, res) {
     }
     res.status(200).json({ received: true });
   } catch (err) {
-    console.error('🆘 Error handling webhook event:', err);
+    console.error('🆘 Error handling webhook event (outside SMS send):', err);
     res.status(500).json({ error: 'Internal server error handling event.' });
   }
 } 
