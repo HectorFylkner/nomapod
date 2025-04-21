@@ -1,6 +1,7 @@
 import Stripe from 'stripe';
 import { buffer } from 'micro';
-import Twilio from 'twilio';
+import { Vonage } from '@vonage/server-sdk';
+import { SMS } from '@vonage/messages';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2024-04-10',
@@ -18,9 +19,9 @@ export default async function handler(req, res) {
     return res.status(405).send('Method Not Allowed');
   }
 
-  const accountSid = process.env.TWILIO_ACCOUNT_SID;
-  const authToken = process.env.TWILIO_AUTH_TOKEN;
-  const client = (accountSid && authToken) ? Twilio(accountSid, authToken) : null;
+  const apiKey = process.env.VONAGE_API_KEY;
+  const apiSecret = process.env.VONAGE_API_SECRET;
+  const vonage = (apiKey && apiSecret) ? new Vonage({ apiKey, apiSecret }) : null;
 
   const sig = req.headers['stripe-signature'];
   
@@ -45,35 +46,41 @@ export default async function handler(req, res) {
         const pi = event.data.object;
         console.log('✅ PaymentIntent succeeded for id', pi.id);
         const customerPhoneNumber = pi.metadata.phoneNumber;
-        const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
+        const vonageNumber = process.env.VONAGE_NUMBER;
 
-        if (customerPhoneNumber && client && twilioPhoneNumber) {
+        if (customerPhoneNumber && vonage && vonageNumber) {
           const lockCode = "729";
           
           let formattedPhoneNumber = customerPhoneNumber.trim();
           if (formattedPhoneNumber.startsWith('0')) {
-            formattedPhoneNumber = `+46${formattedPhoneNumber.substring(1)}`;
-          } else if (!formattedPhoneNumber.startsWith('+')) {
-            console.warn(`⚠️ Phone number "${customerPhoneNumber}" does not start with 0 or +. Attempting as is, assuming E.164 format.`);
+            formattedPhoneNumber = `46${formattedPhoneNumber.substring(1)}`;
+          } else if (formattedPhoneNumber.startsWith('+')) {
+            formattedPhoneNumber = formattedPhoneNumber.substring(1);
+          } else {
+            console.warn(`⚠️ Phone number "${customerPhoneNumber}" has unexpected format. Attempting as is for Vonage.`);
           }
           
           const messageBody = `Your nomapod lock code is: ${lockCode}.`;
 
           try {
-            console.log(`Attempting to send SMS lock code to ${formattedPhoneNumber} from ${twilioPhoneNumber}`);
-            const message = await client.messages.create({
-              body: messageBody,
-              from: twilioPhoneNumber,
-              to: formattedPhoneNumber
-            });
-            console.log(`✅ SMS sent successfully! SID: ${message.sid}`);
+            console.log(`Attempting to send SMS lock code via Vonage to ${formattedPhoneNumber} from ${vonageNumber}`);
+            
+            const message = new SMS(messageBody, formattedPhoneNumber, vonageNumber);
+            const results = await vonage.messages.send(message);
+            
+            if (results && results.message_uuid) {
+              console.log(`✅ SMS submitted successfully via Vonage! Message UUID: ${results.message_uuid}`);
+            } else {
+              console.warn(`⚠️ Vonage SMS submission may not have succeeded. Response:`, results);
+            }
+            
           } catch (smsError) {
-            console.error(`🆘 Failed to send SMS to ${formattedPhoneNumber}:`, smsError);
+            console.error(`🆘 Failed to send SMS via Vonage to ${formattedPhoneNumber}:`, smsError);
           }
         } else {
-          if (!customerPhoneNumber) console.warn("⚠️ Cannot send SMS: Customer phone number missing from payment metadata.");
-          if (!client) console.warn("⚠️ Cannot send SMS: Twilio client not initialized (check TWILIO_ACCOUNT_SID/TWILIO_AUTH_TOKEN).");
-          if (!twilioPhoneNumber) console.warn("⚠️ Cannot send SMS: TWILIO_PHONE_NUMBER env var not set.");
+          if (!customerPhoneNumber) console.warn("⚠️ Cannot send SMS: Customer phone number missing.");
+          if (!vonage) console.warn("⚠️ Cannot send SMS: Vonage client not initialized (check VONAGE_API_KEY/VONAGE_API_SECRET).");
+          if (!vonageNumber) console.warn("⚠️ Cannot send SMS: VONAGE_NUMBER env var not set.");
         }
         break;
       case 'payment_intent.payment_failed':

@@ -12,6 +12,7 @@
   "dependencies": {
     "@stripe/react-stripe-js": "^3.6.0",
     "@stripe/stripe-js": "^7.1.0",
+    "@vonage/server-sdk": "^3.20.1",
     "micro": "^10.0.1",
     "react": "^18.2.0",
     "react-countup": "^6.5.3",
