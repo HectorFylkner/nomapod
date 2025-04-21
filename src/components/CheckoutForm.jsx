@@ -133,7 +133,8 @@ function CheckoutForm({ totalPrice }) { // Accept totalPrice to display on butto
                 <h3>Payment Successful!</h3>
                 <p>Thank you for your purchase.</p>
                 <p><strong>Please check your phone for the SMS unlock code.</strong></p>
-                <p style={{ marginTop: '10px', fontSize: '0.85em', color: '#6c757d' }}>
+                {/* Add reset instructions with a class */}
+                <p className="reset-instructions" style={{ marginTop: '15px'}}> {/* Adjusted style attribute */}
                     Remember to reset the lock to 000 after collecting your items.
                 </p>
                 {/* Optional: Add a button to close/reset */}

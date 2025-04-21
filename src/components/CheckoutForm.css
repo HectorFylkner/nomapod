@@ -11,21 +11,43 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 20px;
-  background-color: #f8f9fa;
+  padding: 25px 20px; /* Increased padding */
+  background-color: #f0fdf4; /* Lighter green background */
+  border: 1px solid #bbf7d0; /* Green border */
   border-radius: 8px;
   margin-top: 20px;
+  color: #1f2937; /* Darker text */
 }
 
 .payment-success h3 {
   margin-top: 15px;
   margin-bottom: 10px;
-  color: #28a745; /* Bootstrap success color */
+  color: #16a34a; /* Darker success green */
+  font-weight: 600; /* Slightly bolder */
 }
 
 .payment-success p {
-  margin-bottom: 5px;
-  font-size: 0.95em;
+  margin-bottom: 8px; /* Increased spacing */
+  font-size: 1em; /* Slightly larger base font */
+  line-height: 1.5;
+}
+
+.payment-success p strong {
+  font-weight: 600; /* Make primary instruction bold */
+}
+
+/* Style the reset instructions */
+.reset-instructions {
+  font-size: 0.95em !important; /* Larger than before */
+  color: #4b5563 !important; /* Darker grey */
+  font-weight: 500; /* Medium weight */
+  margin-top: 20px !important; /* More space above */
+  padding: 10px; /* Add padding */
+  background-color: #f3f4f6; /* Slight background */
+  border-radius: 4px; /* Rounded corners */
+  max-width: 80%; /* Control width */
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* Basic SVG Checkmark Animation */

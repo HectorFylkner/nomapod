@@ -21,6 +21,31 @@ if (!import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY) {
   // Optionally, render an error message or prevent app load
 }
 
+// --- Define Stripe Appearance --- 
+const stripeAppearance = {
+  theme: 'stripe',
+  variables: {
+    colorPrimary: '#5469d4', 
+    colorBackground: '#ffffff',
+    colorText: '#30313d',
+    colorDanger: '#df1b41',
+    fontFamily: 'Ideal Sans, system-ui, sans-serif',
+    spacingUnit: '4px',
+    borderRadius: '4px',
+  },
+  rules: {
+    '.Input': { 
+       border: '1px solid #d1d1d1',
+       boxShadow: 'none',
+    },
+    '.Label': { 
+       fontWeight: '500',
+       marginBottom: '6px',
+    }
+  }
+};
+// -----------------------------
+
 const NUM_SKELETONS = 4;
 
 function App() {
@@ -194,7 +219,7 @@ function App() {
   // Options for Stripe Elements provider
   const options = {
     clientSecret,
-    // appearance: { /* Customize appearance here if needed */ },
+    appearance: stripeAppearance, // Pass the appearance object here
   };
 
   // Render Error state first if product fetch failed
