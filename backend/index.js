@@ -4,7 +4,15 @@ const cors = require('cors');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const app = express();
+console.log('Backend script started execution.'); // Add log here
+
 const port = process.env.PORT || 5000;
+
+// Simple request logger middleware (BEFORE CORS)
+app.use((req, res, next) => {
+  console.log(`Incoming Request: ${req.method} ${req.path}`);
+  next();
+});
 
 // Use default CORS middleware (allow all origins) for debugging
 app.use(cors()); 
