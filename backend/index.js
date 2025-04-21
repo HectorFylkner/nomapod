@@ -31,14 +31,14 @@ app.post('/webhook', express.raw({type: 'application/json'}), (req, res) => {
   console.log('Webhook endpoint hit'); // Log entry into webhook handler
   const sig = req.headers['stripe-signature'];
   
-  // Explicitly log the value read from process.env
-  const rawWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-  console.log('Attempting to read webhook secret. Value retrieved from process.env:', rawWebhookSecret);
+  // Explicitly log the value read from process.env using the NEW name
+  const rawWebhookSecret = process.env.MY_STRIPE_WH_SECRET; // <-- Use new name here
+  console.log('Attempting to read webhook secret. Value retrieved from process.env[MY_STRIPE_WH_SECRET]:', rawWebhookSecret);
   
   const webhookSecret = rawWebhookSecret; // Use the logged value
 
   if (!webhookSecret) {
-    console.error('Stripe webhook secret is not set (checked after logging).'); // Refined error message
+    console.error('Stripe webhook secret (MY_STRIPE_WH_SECRET) is not set (checked after logging).'); // Refined error message
     return res.status(400).send('Webhook Error: Server configuration error.');
   }
 
