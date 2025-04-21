@@ -70,6 +70,8 @@ function CheckoutForm({ totalPrice }) { // Accept totalPrice to display on butto
             console.log("Payment confirmation successful (client-side)!");
             setMessage(null); // Clear processing message
             setPaymentStatus('succeeded'); 
+            // ADD LOGGING HERE
+            console.log("[handleSubmit] Set paymentStatus to: succeeded"); 
         } else {
             // Handle other potential statuses if needed
             setMessage("Payment status uncertain. Please check your account or contact support.");
