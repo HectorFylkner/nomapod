@@ -19,13 +19,50 @@ function CheckoutForm({ totalPrice }) { // Accept totalPrice to display on butto
         if (!stripe) {
             return;
         }
-        // Optionally retrieve the PaymentIntent status here if needed
-        // const clientSecret = new URLSearchParams(window.location.search).get(
-        //   "payment_intent_client_secret"
-        // );
-        // if (!clientSecret) { return; }
-        // stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => { ... });
-    }, [stripe]);
+        
+        // --- Check URL for Stripe redirect params on initial load --- 
+        const clientSecret = new URLSearchParams(window.location.search).get(
+          "payment_intent_client_secret"
+        );
+        const redirectStatus = new URLSearchParams(window.location.search).get(
+          "redirect_status"
+        );
+
+        if (!clientSecret) {
+          return; // No client secret in URL, normal load
+        }
+
+        // Retrieve the PaymentIntent based on client secret in URL
+        stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
+          switch (paymentIntent?.status) {
+            case "succeeded":
+              setMessage(null);
+              setPaymentStatus('succeeded'); 
+              console.log("[useEffect] Payment succeeded via redirect check.");
+              break;
+            case "processing":
+              setMessage("Payment processing. We'll update you when payment is received.");
+              setPaymentStatus('processing');
+              console.log("[useEffect] Payment processing via redirect check.");
+              break;
+            case "requires_payment_method":
+              setMessage("Payment failed. Please try another payment method.");
+              setPaymentStatus('error');
+              console.error("[useEffect] Payment failed via redirect check.");
+              break;
+            default:
+              setMessage("Something went wrong checking payment status.");
+              setPaymentStatus('error');
+              console.error("[useEffect] Unknown payment status via redirect check:", paymentIntent?.status);
+              break;
+          }
+          // --- Optional: Clean the URL --- 
+          // Remove query params from URL so they don't linger
+          // window.history.replaceState(null, '', window.location.pathname);
+        });
+        // ----------------------------------------------------------
+
+    }, [stripe]); // Depend on stripe being loaded
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -44,10 +81,9 @@ function CheckoutForm({ totalPrice }) { // Accept totalPrice to display on butto
         const { error, paymentIntent } = await stripe.confirmPayment({
             elements,
             confirmParams: {
-                // No return_url needed if using redirect: 'if_required'
-                // return_url: `${window.location.origin}/payment-success`, 
+                // Make sure to change this to your payment completion page
+                return_url: `${window.location.origin}${window.location.pathname}`, // Return to the same page
             },
-            // Add redirect: 'if_required' to handle result without redirecting
             redirect: "if_required"
         });
         // ---------------------------------------------------------------
@@ -114,7 +150,7 @@ function CheckoutForm({ totalPrice }) { // Accept totalPrice to display on butto
     return (
         <form id="payment-form" onSubmit={handleSubmit}>
             <PaymentElement id="payment-element" options={paymentElementOptions} />
-            <button disabled={isLoading || !stripe || !elements} id="submit" className="stripe-pay-button">
+            <button type="submit" disabled={isLoading || !stripe || !elements} id="submit" className="stripe-pay-button">
                 <span id="button-text">
                     {isLoading ? <div className="spinner" id="spinner"></div> : `Pay ${totalPrice} SEK`}
                 </span>

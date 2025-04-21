@@ -12,7 +12,14 @@ import AnimatedBackground from './components/AnimatedBackground';
 import './App.css';
 
 // Load Stripe outside of component render to avoid recreating promise on every render
-const stripePromise = loadStripe('pk_test_51RFlVxFN18Z8RV2NuliLX6cPtgCFq0eKVkZU4dY7W9ityPCSWWQk3RSLj3TvMW8FBsHRsHGbogPrK4BJ4wnqQv1b00EN7Bn7pZ');
+// Get key from Vite environment variables (prefixed with VITE_)
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+
+// Check if the key was actually loaded
+if (!import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY) {
+  console.error("ERROR: VITE_STRIPE_PUBLISHABLE_KEY is not set in environment variables.");
+  // Optionally, render an error message or prevent app load
+}
 
 const NUM_SKELETONS = 4;
 
