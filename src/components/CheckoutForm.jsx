@@ -80,7 +80,12 @@ function CheckoutForm({ totalPrice }) { // Accept totalPrice to display on butto
 
     // --- Render different views based on status --- 
 
+    // ADD LOGGING HERE
+    console.log("[CheckoutForm Render] Current paymentStatus:", paymentStatus);
+
     if (paymentStatus === 'succeeded') {
+        // ADD LOGGING HERE
+        console.log("[CheckoutForm Render] Rendering SUCCESS VIEW");
         return (
             <div className="payment-success">
                 <svg className="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
@@ -96,6 +101,8 @@ function CheckoutForm({ totalPrice }) { // Accept totalPrice to display on butto
         );
     }
 
+    // ADD LOGGING HERE
+    console.log("[CheckoutForm Render] Rendering PAYMENT FORM VIEW");
     // Render payment form for idle, processing, error states
     const paymentElementOptions = {
         layout: "tabs"
