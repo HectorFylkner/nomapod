@@ -121,6 +121,5 @@ app.post('/create-payment-intent', express.json(), async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-}); 
+// Export the Express app for Vercel
+module.exports = app; 
