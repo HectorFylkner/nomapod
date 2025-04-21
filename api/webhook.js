@@ -17,6 +17,14 @@ export default function handler(req, res) {
   }
 
   const sig = req.headers['stripe-signature'];
+  
+  // === Deep Debugging: Log all available environment variables ===
+  console.log('Available ENV_VAR keys:', Object.keys(process.env));
+  // Log specific keys we expect
+  console.log('Attempting to read STRIPE_SECRET_KEY:', process.env.STRIPE_SECRET_KEY ? 'Set' : 'Not Set');
+  console.log('Attempting to read STRIPE_WEBHOOK_SECRET:', process.env.STRIPE_WEBHOOK_SECRET ? 'Set' : 'Not Set/Empty');
+  // ============================================================
+
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!secret) {
     console.error('Stripe webhook secret is not set.');
