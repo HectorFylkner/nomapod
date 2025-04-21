@@ -111,7 +111,7 @@ function App() {
     prevCanProceedRef.current = canProceedToPayment;
   }, [canProceedToPayment]);
 
-  // Modified handleShowPaymentInfo to call the real backend
+  // Modified handleShowPaymentInfo to use the new Vercel API route
   const handleShowPaymentInfo = async () => { // Make async for await
     if (!canProceedToPayment || isSubmitting) return;
 
@@ -126,19 +126,12 @@ function App() {
     };
 
     try {
-      // Get the API URL from environment variables
-      const apiUrl = import.meta.env.VITE_API_URL;
-      if (!apiUrl) {
-        throw new Error("API URL is not configured.");
-      }
-
-      console.log("Calling backend to create PaymentIntent:", `${apiUrl}/create-payment-intent`);
-      const response = await fetch(`${apiUrl}/create-payment-intent`, { 
-        method: 'POST', 
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(backendPayload) 
+      // Create a PaymentIntent via the new Vercel API route
+      console.log("Calling backend to create PaymentIntent: /api/create-payment-intent");
+      const response = await fetch('/api/create-payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(backendPayload)
       });
 
       if (!response.ok) {
