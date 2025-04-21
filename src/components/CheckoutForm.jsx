@@ -64,6 +64,39 @@ function CheckoutForm({ totalPrice }) { // Accept totalPrice to display on butto
 
     }, [stripe]); // Depend on stripe being loaded
 
+    // --- New useEffect to check for Apple Pay availability (for logging) ---
+    useEffect(() => {
+        if (stripe) {
+            const paymentRequest = stripe.paymentRequest({
+                country: 'SE', // Country code
+                currency: 'sek', // Currency code
+                total: {
+                    label: 'Nomapod Item', // Placeholder label
+                    amount: 100, // Placeholder amount (1 SEK) - actual amount doesn't matter for canMakePayment
+                },
+                requestPayerName: false,
+                requestPayerEmail: false,
+            });
+
+            paymentRequest.canMakePayment().then(result => {
+                if (result) {
+                    // result can be {applePay: true}, {googlePay: true}, etc. or null
+                    console.log('[PaymentRequest Check] Wallet payment detected:', result);
+                    if (result.applePay) {
+                        console.log('[PaymentRequest Check] ✅ Apple Pay *should* be available.');
+                    } else {
+                        console.log('[PaymentRequest Check] ⚠️ Apple Pay compatibility check returned false or non-ApplePay wallet.');
+                    }
+                } else {
+                    console.log('[PaymentRequest Check] ❌ No wallet payment method available (or check failed).');
+                }
+            }).catch(err => {
+                console.error('[PaymentRequest Check] Error checking canMakePayment:', err);
+            });
+        }
+    }, [stripe]); // Run when stripe is loaded
+    // --- End Apple Pay check ---
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -154,6 +187,8 @@ function CheckoutForm({ totalPrice }) { // Accept totalPrice to display on butto
     return (
         <form id="payment-form" onSubmit={handleSubmit}>
             <PaymentElement id="payment-element" options={paymentElementOptions} />
+            {/* Add a placeholder div for potential future PaymentRequestButton if needed */}
+            {/* <div id="payment-request-button"></div> */}
             <button type="submit" disabled={isLoading || !stripe || !elements} id="submit" className="stripe-pay-button">
                 <span id="button-text">
                     {isLoading ? <div className="spinner" id="spinner"></div> : `Pay ${totalPrice} SEK`}
