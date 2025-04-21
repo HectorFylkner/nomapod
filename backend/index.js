@@ -38,9 +38,34 @@ app.post('/webhook', express.raw({type: 'application/json'}), (req, res) => {
   switch (event.type) {
     case 'payment_intent.succeeded':
       const paymentIntentSucceeded = event.data.object;
-      console.log('PaymentIntent was successful!', paymentIntentSucceeded.id);
-      // TODO: Fulfill the purchase based on paymentIntentSucceeded
-      // e.g., update database, send confirmation email, etc.
+      // Log detailed information from the successful payment intent
+      console.log('PaymentIntent Succeeded:', paymentIntentSucceeded.id);
+      console.log('Amount received:', paymentIntentSucceeded.amount); // Amount in cents/öre
+      console.log('Currency:', paymentIntentSucceeded.currency);
+      console.log('Receipt Email:', paymentIntentSucceeded.receipt_email); // Might be null
+      // Log billing details if available from the charge
+      if (paymentIntentSucceeded.charges?.data?.length > 0) {
+        console.log('Billing Details:', paymentIntentSucceeded.charges.data[0].billing_details);
+      } else {
+        console.log('No charge details found.');
+      }
+
+      // TODO: Add verification logic if needed (compare amount to expected amount)
+
+      // TODO: Get the "Lock to the box" code (how?)
+      const lockCode = "TEMP_LOCK_CODE_123"; // Placeholder
+
+      // TODO: Get customer email (check logs above to see where it is)
+      const customerEmail = paymentIntentSucceeded.receipt_email || paymentIntentSucceeded.charges?.data?.[0]?.billing_details?.email;
+
+      if (customerEmail && lockCode) {
+        console.log(`TODO: Send lock code ${lockCode} to ${customerEmail}`);
+        // TODO: Implement actual email sending logic here
+      } else {
+        console.error('Could not send lock code. Missing customer email or lock code.', { email: customerEmail, code: lockCode });
+      }
+
+      // TODO: Fulfill the purchase based on paymentIntentSucceeded (e.g., update database)
       break;
     case 'payment_intent.payment_failed':
       const paymentIntentFailed = event.data.object;
