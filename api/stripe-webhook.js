@@ -1,5 +1,6 @@
 import Stripe from 'stripe';
 import { buffer } from 'micro';
+import Twilio from 'twilio';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2024-04-10',
@@ -17,15 +18,12 @@ export default async function handler(req, res) {
     return res.status(405).send('Method Not Allowed');
   }
 
+  const accountSid = process.env.TWILIO_ACCOUNT_SID;
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
+  const client = (accountSid && authToken) ? Twilio(accountSid, authToken) : null;
+
   const sig = req.headers['stripe-signature'];
   
-  // === Deep Debugging: Log all available environment variables ===
-  console.log('Available ENV_VAR keys:', Object.keys(process.env));
-  // Log specific keys we expect
-  console.log('Attempting to read STRIPE_SECRET_KEY:', process.env.STRIPE_SECRET_KEY ? 'Set' : 'Not Set');
-  console.log('Attempting to read STRIPE_WEBHOOK_SECRET:', process.env.STRIPE_WEBHOOK_SECRET ? 'Set' : 'Not Set/Empty');
-  // ============================================================
-
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!secret) {
     console.error('Stripe webhook secret is not set.');
@@ -46,9 +44,36 @@ export default async function handler(req, res) {
       case 'payment_intent.succeeded':
         const pi = event.data.object;
         console.log('✅ PaymentIntent succeeded for id', pi.id);
-        const phone = pi.metadata.phoneNumber;
-        if (phone) {
-          console.log(`TODO: Send lock code to ${phone}`);
+        const customerPhoneNumber = pi.metadata.phoneNumber;
+        const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
+
+        if (customerPhoneNumber && client && twilioPhoneNumber) {
+          const lockCode = "729";
+          
+          let formattedPhoneNumber = customerPhoneNumber.trim();
+          if (formattedPhoneNumber.startsWith('0')) {
+            formattedPhoneNumber = `+46${formattedPhoneNumber.substring(1)}`;
+          } else if (!formattedPhoneNumber.startsWith('+')) {
+            console.warn(`⚠️ Phone number "${customerPhoneNumber}" does not start with 0 or +. Attempting as is, assuming E.164 format.`);
+          }
+          
+          const messageBody = `Your nomapod lock code is: ${lockCode}.`;
+
+          try {
+            console.log(`Attempting to send SMS lock code to ${formattedPhoneNumber} from ${twilioPhoneNumber}`);
+            const message = await client.messages.create({
+              body: messageBody,
+              from: twilioPhoneNumber,
+              to: formattedPhoneNumber
+            });
+            console.log(`✅ SMS sent successfully! SID: ${message.sid}`);
+          } catch (smsError) {
+            console.error(`🆘 Failed to send SMS to ${formattedPhoneNumber}:`, smsError);
+          }
+        } else {
+          if (!customerPhoneNumber) console.warn("⚠️ Cannot send SMS: Customer phone number missing from payment metadata.");
+          if (!client) console.warn("⚠️ Cannot send SMS: Twilio client not initialized (check TWILIO_ACCOUNT_SID/TWILIO_AUTH_TOKEN).");
+          if (!twilioPhoneNumber) console.warn("⚠️ Cannot send SMS: TWILIO_PHONE_NUMBER env var not set.");
         }
         break;
       case 'payment_intent.payment_failed':
