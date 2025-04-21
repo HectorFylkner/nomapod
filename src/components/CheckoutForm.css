@@ -130,4 +130,43 @@
   100% {
     transform: rotate(360deg);
   }
+}
+
+/* --- New Styles for Payment Button --- */
+#submit.stripe-pay-button {
+  background-color: #5469d4; /* Stripe blue */
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%; /* Make button full width */
+  margin-top: 20px; /* Add space above the button */
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px; /* Ensure consistent height even with spinner */
+}
+
+#submit.stripe-pay-button:hover:not(:disabled) {
+  background-color: #4355a9; /* Darker blue on hover */
+}
+
+#submit.stripe-pay-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Ensure spinner inside button is sized appropriately */
+#submit.stripe-pay-button .spinner {
+  color: white; /* Spinner color */
+  /* Adjust size if needed, but defaults might be okay */
+}
+
+/* Adjustments for Payment Element Spacing */
+#payment-element {
+  margin-bottom: 20px; /* Add space below the payment element inputs */
 } 
