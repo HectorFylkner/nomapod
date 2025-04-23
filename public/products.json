@@ -19,7 +19,7 @@
         "id": "prod3",
         "name": "Barebell Protein Bar",
         "price": 22,
-        "imgSrc": "barebell-cashew.avif",
+        "imgSrc": "barebell-cashew.webp",
         "altText": "Barebell Caramel Cashew protein bar",
         "isActive": true
     },
