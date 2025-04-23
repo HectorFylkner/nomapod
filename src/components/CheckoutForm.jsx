@@ -159,7 +159,7 @@ function CheckoutForm({ totalPrice }) { // Accept totalPrice to display on butto
         console.log("[CheckoutForm Render] Rendering SUCCESS VIEW");
         return (
             <div className="payment-success">
-                <svg className="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                <svg className="checkmark" xmlns="http://www.w.org/2000/svg" viewBox="0 0 52 52">
                     <circle className="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
                     <path className="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
                 </svg>
@@ -170,10 +170,10 @@ function CheckoutForm({ totalPrice }) { // Accept totalPrice to display on butto
                 <p className="reset-instructions" style={{ marginTop: '15px'}}>
                     Remember to reset the lock to 000 after collecting your items.
                 </p>
-                {/* Updated Google Form Link */}
+                {/* Updated Google Form Link Text and Style */}
                 <p style={{ marginTop: '20px' }}>
                     <a href="https://docs.google.com/forms/d/e/1FAIpQLSc7c8HgBm6xv270LhAgQCuvlNvMyT6iTsbaA_ACUnQVuSbUhw/viewform" target="_blank" rel="noopener noreferrer">
-                        We'd be very thankful if you'd want to answer our very short survey!
+                        We'd be very thankful if you'd want to answer our very short survey!<strong> (Click here)</strong>
                     </a>
                 </p>
                 {/* Optional: Add a button to close/reset */}
