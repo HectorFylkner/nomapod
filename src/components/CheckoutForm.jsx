@@ -167,8 +167,14 @@ function CheckoutForm({ totalPrice }) { // Accept totalPrice to display on butto
                 <p>Thank you for your purchase.</p>
                 <p><strong>Please check your phone for the SMS unlock code.</strong></p>
                 {/* Add reset instructions with a class */}
-                <p className="reset-instructions" style={{ marginTop: '15px'}}> {/* Adjusted style attribute */}
+                <p className="reset-instructions" style={{ marginTop: '15px'}}>
                     Remember to reset the lock to 000 after collecting your items.
+                </p>
+                {/* Updated Google Form Link */}
+                <p style={{ marginTop: '20px' }}>
+                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSc7c8HgBm6xv270LhAgQCuvlNvMyT6iTsbaA_ACUnQVuSbUhw/viewform" target="_blank" rel="noopener noreferrer">
+                        We'd be very thankful if you'd want to answer our very short survey!
+                    </a>
                 </p>
                 {/* Optional: Add a button to close/reset */}
                 {/* <button onClick={() => window.location.reload()}>Done</button> */}
