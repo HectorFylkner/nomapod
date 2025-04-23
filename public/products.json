@@ -10,7 +10,7 @@
     {
         "id": "prod2",
         "name": "Nocco",
-        "price": 20,
+        "price": 25,
         "imgSrc": "PB-3542_1.jpg.webp",
         "altText": "Nocco energy drink can",
         "isActive": true
@@ -18,7 +18,7 @@
     {
         "id": "prod3",
         "name": "Barebell Protein Bar",
-        "price": 25,
+        "price": 22,
         "imgSrc": "Barebell.jpg.webp",
         "altText": "Barebell protein bar",
         "isActive": true
@@ -29,6 +29,14 @@
         "price": 20,
         "imgSrc": "GottoBlandat.jpg.webp",
         "altText": "Bag of Gott och Blandat candy",
+        "isActive": true
+    },
+    {
+        "id": "pringles-sc",
+        "name": "Pringles sour cream & onion",
+        "price": 18,
+        "imgSrc": "Pringles.jpg",
+        "altText": "Tube of Pringles sour cream & onion chips",
         "isActive": true
     }
 ] 
