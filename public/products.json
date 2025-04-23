@@ -11,16 +11,16 @@
         "id": "prod2",
         "name": "Nocco",
         "price": 25,
-        "imgSrc": "PB-3542_1.jpg.webp",
-        "altText": "Nocco energy drink can",
+        "imgSrc": "juicy-breeze.webp",
+        "altText": "Nocco Juicy Breeze energy drink can",
         "isActive": true
     },
     {
         "id": "prod3",
         "name": "Barebell Protein Bar",
         "price": 22,
-        "imgSrc": "Barebell.jpg.webp",
-        "altText": "Barebell protein bar",
+        "imgSrc": "barebell-cashew.avif",
+        "altText": "Barebell Caramel Cashew protein bar",
         "isActive": true
     },
     {
